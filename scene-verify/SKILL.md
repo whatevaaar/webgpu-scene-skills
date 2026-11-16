@@ -17,9 +17,34 @@ Interacción en español. El critic trabaja en el idioma que prefiera; traduce s
 
 Si faltan los hooks, pídele a `scene-build` que los añada antes de verificar.
 
+## Gate 0 — Correctitud (mecánico, ANTES del critic estético)
+> **Lección del postmortem (P0).** Verificar belleza sin antes verificar corrección es
+> construir sobre arena. Un critic estético juzga belleza, no corrección: en una sesión real un
+> bug de orientación de cámara (giro de 180°, 1 línea) sobrevivió ~16 rondas de captura porque
+> el critic nunca lo priorizó y la vegetación del suelo se leía como "confeti en el techo". Un
+> humano lo vio de un vistazo. **Estos checks son baratos, deterministas y van primero.**
+
+Antes de gastar un solo token de critic, corré checks mecánicos automáticos sobre las capturas:
+1. **Orientación / no-volteo**: con `?calib=1` (ver `scene-build`), renderizá un objeto de
+   calibración asimétrico (flecha "UP" + ejes). Afirmá que el arriba del mundo está arriba en
+   pantalla y que nada está espejado. Si falla → **fallo mecánico, no se lo pases al critic.**
+2. **Frame no-negro / no-vacío**: histograma de cada pose. Si >~60% de la imagen es casi-negra o
+   el frame es casi uniforme (void, cámara enterrada, o apuntando al cielo) → fallo mecánico.
+3. **Suelo y cielo presentes** en las poses que deberían tenerlos; horizonte en el lugar
+   esperado según el pitch.
+Sólo cuando Gate 0 pasa, seguí al critic. Esto hubiera atrapado el flip y los frames vacíos en
+la primera ronda.
+
 ## Gate 1 — Critic visual (independiente del código)
 Objetivo: detección imparcial de defectos. El critic **sólo ve imágenes/vídeo**, jamás el
 código ni tu razonamiento ni el spec.
+
+> **Los claims del critic son HIPÓTESIS, no verdad (P1).** Un critic de texto puede afirmar con
+> seguridad "no hay fog / sin bloom / sin AA" cuando el código SÍ los tiene — lee un estilo
+> flat-shaded procedural como "roto". Antes de "arreglar" un claim, **verificalo contra el
+> código** (grep del feature). Si el feature existe, es percepción/estilo, no bug → no lo
+> persigas. Pasale al critic el **estilo pretendido** y qué NO marcar como defecto por ser
+> inherente a ese estilo (ver el techo de fidelidad en el spec).
 
 1. **Capturar** (ver `reference/critic-protocol.md` para comandos concretos):
    - Las **6 poses fijas** a la resolución del TARGET (2560×1440 por defecto), en Chrome con
@@ -30,9 +55,18 @@ código ni tu razonamiento ni el spec.
    SÓLO las imágenes + la rúbrica de `reference/critic-protocol.md`. No incluyas rutas de
    código, ni el spec, ni qué intentabas lograr. Pídele defectos **priorizados y concretos**
    con severidad (blocker / major / minor) y ubicación (qué pose / qué momento).
-3. **Iterar**: lleva los defectos ≥ major a `scene-build` (o arréglalos), re-renderiza y
-   re-evalúa con un critic **nuevo** (sin memoria de la ronda anterior). Repite hasta que el
-   critic no reporte **nada por encima de "minor"**.
+3. **Iterar** (con disciplina anti-thrash):
+   - Clasificá cada finding en: *arreglable* / *inherente-al-estilo* / *falso-positivo del
+     critic* (ver nota de hipótesis). Sólo actuá sobre los *arreglables*.
+   - **Causa raíz, no parche repetido**: si el mismo defecto reaparece ≥2 rondas, **parar de
+     parchear y aislar la capa** con los flags `?noX` (`?noVeg`, `?noFlock`, …) para encontrar
+     la fuente. Un síntoma recurrente es señal de causa raíz, no de "subir la dosis del parche".
+   - Llevá los *arreglables* ≥ major a `scene-build`, re-renderizá y re-evaluá con un critic
+     **nuevo** (sin memoria de la ronda anterior).
+   - **Presupuesto explícito**: fijá un tope de rondas/tokens para el loop visual y una
+     definición de "suficientemente bueno" acorde al **techo de fidelidad del spec** (un
+     renderer procedural minimalista no va a pasar un critic que exige fotorrealismo — eso es
+     límite del estilo, no defecto). Pará al llegar al tope y reportá honestamente.
 
 ## Gate 2 — Rendimiento
 Objetivo: frame pacing estable en el TARGET.

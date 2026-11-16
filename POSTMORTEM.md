@@ -158,7 +158,41 @@ primera ronda.
 
 ---
 
-## 8. Conclusión
+## 8. Por qué no alcanzamos el polish del original (Abyssal Garden)
+
+El prompt que generalizamos venía de **Abyssal Garden** de Noniv
+(https://noniv.github.io/abyssal-garden/ · MIT): un solo HTML ~96 KB, WebGPU/WGSL, **compilado
+desde un árbol modular** (`source/` + `npm run build`), con ~2 millones de hojas de kelp, shadow
+casting, Web Audio procedural y escalado adaptativo de resolución/draw-distance. Nuestra escena
+cyberpunk (one-shot, ~36 KB) no llegó a ese nivel. Por qué, honestamente:
+
+1. **La calidad del loop de feedback es la diferencia central.** El autor del original itera con
+   un **viewport en vivo**: ve la escena en movimiento, ajusta con su criterio y re-ve en
+   segundos. Nosotros iteramos **a ciegas** vía capturas estáticas (~4 min por ronda) + un critic
+   de texto que **no ve movimiento y malinterpreta el estilo** (afirmó "sin fog/bloom/AA"
+   existiendo los tres). El polish del último 20% vive en micro-ajustes de ver-y-tocar que un
+   proxy lento y ruidoso no habilita.
+2. **Gastamos el presupuesto de iteración en un bug fantasma.** El flip de orientación se comió
+   ~10 rondas. Un humano con sus ojos no pelea contra su propia tooling.
+3. **Producto maduro vs. one-shot.** 96 KB compilados desde código modular, con densidad masiva
+   (2M hojas vs. nuestros miles de instancias), shadows, audio, LOD adaptativo y touch →
+   representa **mucho más trabajo deliberado y features** que un `index.html` generado en una
+   sesión.
+4. **El pipeline optimiza "spec rico + renderer correcto y rápido", no el long tail de dirección
+   de arte.** Densidad, materiales texturizados, AA/shadows afinados y caminos de cámara
+   compuestos a mano son **taste + tiempo humano**, justo donde los loops automáticos son más
+   débiles.
+5. **Un critic estético hostil no converge contra un estilo minimalista** — exige fotorrealismo
+   y nunca da "pasa", así que no sirve como criterio de "listo" para este tipo de escena.
+6. **Faltó la capa de correctitud** (orientación, suelo/cielo, frame-no-vacío) que un humano
+   tiene gratis — ver P0. Sin ella, el loop pulía sobre una base torcida.
+
+En una frase: **el original lo pulió una persona con criterio y un viewport en tiempo real; el
+nuestro lo pulió un loop automático a través de un proxy lento, caro y a veces equivocado.** El
+pipeline es excelente para llegar al 80% (spec rico, render correcto, perf en presupuesto); el
+20% final de polish estético sigue necesitando ojo humano y/o un feedback loop en vivo.
+
+## 9. Conclusión
 
 Las skills son un buen andamiaje y el gate independiente demostró su valor. La lección que
 vale la pena institucionalizar: **verificar corrección (mecánica, barata, determinista) ANTES

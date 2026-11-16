@@ -5,6 +5,23 @@ en tiempo real para el navegador** (WebGPU, sin motores, un solo `index.html`). 
 prompt de la escena submarina de fantasía para que sirva con **cualquier tema** (desierto
 alienígena, cavernas de cristal, jardín cyberpunk, ruinas flotantes…).
 
+## Origen y atribución
+
+El **prompt y la escena submarina de referencia** (el default de `scene-spec` y la vara de
+riqueza, `scene-spec/reference/default-underwater.md`) están basados en **Abyssal Garden**, de
+**[Noniv](https://github.com/Noniv)** — una escena submarina WebGPU procedural en un solo HTML:
+
+- 🌐 Demo: https://noniv.github.io/abyssal-garden/
+- 💻 Repo: https://github.com/Noniv/abyssal-garden — **Licencia MIT**, © Noniv.
+
+Estas skills son un **trabajo independiente** que *generaliza ese prompt* a un flujo reutilizable
+para cualquier escena; **no incluyen ni derivan del código fuente** de Abyssal Garden (que es un
+árbol modular compilado a `index.html` vía `npm run build`). Abyssal Garden es un producto
+pulido a mano por su autor; aquí se lo cita como inspiración y referencia de calidad. Todo el
+crédito del original es de Noniv bajo MIT. Ver [`POSTMORTEM.md`](POSTMORTEM.md) para una
+comparación honesta de nivel de polish y por qué una escena generada por este pipeline no lo
+alcanza en una sola sesión.
+
 ## Flujo
 
 ```

@@ -60,6 +60,26 @@ Deja estos ganchos para que `/scene-verify` funcione sin tocar la lógica de ren
 - `window.__ready`: flag que indica que el primer frame válido ya se dibujó (para que el
   verificador sepa cuándo capturar).
 
+## Hooks de SANITY por defecto (P0 del postmortem — no opcionales)
+> **Por qué.** Un bug de orientación de cámara (giro de 180°, 1 línea) sobrevivió ~16 rondas de
+> verificación en una sesión real porque el critic estético no verifica corrección. Estos
+> ganchos hacen la corrección **barata, mecánica y determinista**, para que `scene-verify` corra
+> su Gate 0 ANTES del critic.
+- `?calib=1`: dibuja un **objeto de calibración de orientación** — una flecha "UP" y ejes
+  XYZ etiquetados en el mundo. Permite afirmar automáticamente que el arriba del mundo está
+  arriba en pantalla y que nada está espejado/volteado.
+- **Colisión + clamp de suelo por defecto** en cámara libre: la cámara no atraviesa la
+  geometría sólida ni cae por debajo del suelo (resuelto con checks de AABB preasignados, cero
+  asignaciones por frame). Volar por encima de los techos sigue permitido.
+- **Flags de aislamiento de capas**: `?noVeg`, `?noFlock`, `?noRain`, `?noVolumetrics`, … leídos
+  **una sola vez al init** (sin costo por frame), para que `scene-verify` haga diagnóstico por
+  aislamiento (causa raíz) cuando un defecto reaparece.
+- `window.__cam`: expón la cámara para inspección/manejo desde el harness de verificación.
+- **Sanity de orientación en el propio código**: la matriz de vista es el punto #1 donde se
+  cuela un volteo. Deriva `right = normalize(cross(forward, worldUp))` y `up = cross(right,
+  forward)`, y verifica con un caso conocido (cámara mirando a −Z ⇒ right=+X, up=+Y) antes de
+  confiar en las poses.
+
 ## Entrega
 Escribe `index.html` en el directorio de trabajo. Luego:
 - Minifica mentalmente/realmente para **reportar el tamaño minificado** (y el crudo). Si
