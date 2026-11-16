@@ -1,0 +1,8 @@
+﻿# Artefactos generados por las skills (no forman parte del set)
+scene-spec.md
+index.html
+index.min.html
+flythrough/
+*.png
+*.mp4
+*.gif
