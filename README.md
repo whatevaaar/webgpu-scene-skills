@@ -65,3 +65,7 @@ webgpu-scene-skills/
 
 La interacción con el usuario es en **español**; los artefactos técnicos (`scene-spec.md`,
 código, comentarios) en **inglés**, porque son prompts/código de ingeniería.
+
+## Licencia
+
+[GPL-3.0](LICENSE) © Emiliano Hidalgo.
