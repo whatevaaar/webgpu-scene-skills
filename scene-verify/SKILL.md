@@ -24,16 +24,21 @@ Si faltan los hooks, pídele a `scene-build` que los añada antes de verificar.
 > el critic nunca lo priorizó y la vegetación del suelo se leía como "confeti en el techo". Un
 > humano lo vio de un vistazo. **Estos checks son baratos, deterministas y van primero.**
 
-Antes de gastar un solo token de critic, corré checks mecánicos automáticos sobre las capturas:
-1. **Orientación / no-volteo**: con `?calib=1` (ver `scene-build`), renderizá un objeto de
-   calibración asimétrico (flecha "UP" + ejes). Afirmá que el arriba del mundo está arriba en
-   pantalla y que nada está espejado. Si falla → **fallo mecánico, no se lo pases al critic.**
-2. **Frame no-negro / no-vacío**: histograma de cada pose. Si >~60% de la imagen es casi-negra o
-   el frame es casi uniforme (void, cámara enterrada, o apuntando al cielo) → fallo mecánico.
-3. **Suelo y cielo presentes** en las poses que deberían tenerlos; horizonte en el lugar
-   esperado según el pitch.
-Sólo cuando Gate 0 pasa, seguí al critic. Esto hubiera atrapado el flip y los frames vacíos en
-la primera ronda.
+Antes de gastar un solo token de critic, corré **`reference/gate0-metrics.js`** (Node +
+Puppeteer + pngjs, sin LLM, ~1 min, gratis):
+```
+node reference/gate0-metrics.js "file:///ABS/PATH/index.html"
+```
+Verifica mecánicamente, de forma determinista:
+1. **Orientación**: con `?calib=1` el motor dibuja 3 marcadores de color (verde=UP, rojo=DOWN,
+   amarillo=+X derecha). El script lee sus centroides y afirma que arriba está arriba y que +X
+   está a la derecha → **atrapa flips verticales Y espejos horizontales**. (Probado: con el bug
+   de 180° reintroducido, falla en ~5 s.)
+2. **Void / frame-vacío** por pose: `darkFrac` (histograma de luminancia) + `varr` (varianza
+   espacial). Atrapa voids negros, cámara enterrada en pared, y cámara apuntando al cielo vacío.
+
+Exit 0 = PASS (seguí al critic). Exit ≠ 0 = **fallo mecánico: arreglalo primero, no gastes
+tokens de critic.** Esto hubiera atrapado el flip y los frames vacíos en la primera ronda.
 
 ## Gate 1 — Critic visual (independiente del código)
 Objetivo: detección imparcial de defectos. El critic **sólo ve imágenes/vídeo**, jamás el
@@ -81,13 +86,18 @@ Objetivo: frame pacing estable en el TARGET.
    `scene-build`), optimiza y vuelve a medir.
 
 ## Entrega (DONE WHEN)
-Ambos gates deben pasar. Entrega en español:
+Los **tres** gates deben pasar (0 mecánico → 1 critic → 2 perf). Entrega en español:
 - Veredicto del critic final (resumen + que no hay nada > minor).
 - Reporte de perf: avg / p99 / max, y si cumple el TARGET.
 - Confirmación de tamaño minificado del `index.html` (de `scene-build`).
 - Lista de defectos corregidos durante la iteración.
 
 ## Archivos de apoyo
+- `reference/gate0-metrics.js` — **Gate 0**: checks mecánicos de correctitud (orientación vía
+  `?calib` + void/frame-vacío), sin LLM. Se corre ANTES del critic.
+- `reference/critic-ensemble.md` — **Gate 1 robusto**: anclar el critic al estilo, verificar
+  cada claim contra código/métrica (mata falsos positivos), ensemble ≥2/3, A/B diferencial,
+  causa raíz automática y presupuesto.
 - `reference/critic-protocol.md` — comandos de captura, aislamiento del critic, rúbrica y
   escala de severidad.
 - `reference/perf-protocol.md` — ejecución del fly-through, lectura de timestamps, criterios.

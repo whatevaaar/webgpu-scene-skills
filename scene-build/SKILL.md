@@ -65,9 +65,19 @@ Deja estos ganchos para que `/scene-verify` funcione sin tocar la lógica de ren
 > verificación en una sesión real porque el critic estético no verifica corrección. Estos
 > ganchos hacen la corrección **barata, mecánica y determinista**, para que `scene-verify` corra
 > su Gate 0 ANTES del critic.
-- `?calib=1`: dibuja un **objeto de calibración de orientación** — una flecha "UP" y ejes
-  XYZ etiquetados en el mundo. Permite afirmar automáticamente que el arriba del mundo está
-  arriba en pantalla y que nada está espejado/volteado.
+- `?calib=1`: **contrato de calibración de orientación** (lo lee `gate0-metrics.js`). Fija la
+  cámara en una pose nivelada (pitch 0, por encima del skyline) y dibuja **3 marcadores de color
+  puro sin iluminar** delante de la cámara, posicionados en **ejes de MUNDO** (no de cámara, para
+  que el check detecte espejos):
+  - **verde** en world `+Y` (arriba), **rojo** en world `−Y` (abajo), **amarillo** en world `+X`
+    (derecha).
+  - Color puro: en el fragment, override al final (`if(kind==marker){ out = col*2.0 }`) **después**
+    de todo uso de `fwidth` — un `return` temprano sobre un valor no-uniforme rompe `fwidth`
+    (lección aprendida). Exentos de niebla/ambient/floor para que el centroide de color sea limpio.
+  - Mantené los marcadores dentro del FOV (offset angular < medio-FOV vertical) o el verde/rojo se
+    recortan contra el borde.
+  El harness afirma `verde.y < rojo.y` (arriba sobre abajo) y `amarillo.x > centro.x` (+X a la
+  derecha) → atrapa flips verticales y espejos horizontales.
 - **Colisión + clamp de suelo por defecto** en cámara libre: la cámara no atraviesa la
   geometría sólida ni cae por debajo del suelo (resuelto con checks de AABB preasignados, cero
   asignaciones por frame). Volar por encima de los techos sigue permitido.
