@@ -115,7 +115,23 @@ Los **tres** gates deben pasar (0 mecánico → 1 critic → 2 perf). Entrega en
 - Confirmación de tamaño minificado del `index.html` (de `scene-build`).
 - Lista de defectos corregidos durante la iteración.
 
+## Extra — Video deliverable (vertical / horizontal, duración parametrizable)
+Para entregar un clip del procedural (showreel, redes, preview), usá
+**`reference/record-video.js`**: graba el fly-through determinista vía `MediaRecorder` sobre
+`canvas.captureStream()` (sin ffmpeg) y escribe un `.webm` (VP9).
+```
+node reference/record-video.js "file:///ABS/PATH/index.html" horizontal 5 video_h.webm
+node reference/record-video.js "file:///ABS/PATH/index.html" vertical  5 video_v.webm
+```
+- Orientación: `horizontal` (1920×1080) o `vertical` (1080×1920).
+- Duración: segundos (default 5, parametrizable).
+- Requiere `puppeteer-core` resoluble (mismo setup que `gate0-metrics.js`) y usa el fly-through
+  (`?flythrough=1`), así que funciona con cualquier escena que tenga los hooks de `scene-build`.
+- Guardá el clip en la carpeta de la escena (`scenes/<slug>/`).
+
 ## Archivos de apoyo
+- `reference/record-video.js` — graba un clip `.webm` (vertical/horizontal, duración param.) del
+  fly-through vía MediaRecorder. Deliverable de video, sin dependencias de encoder externo.
 - `reference/gate0-metrics.js` — **Gate 0**: checks mecánicos de correctitud (orientación vía
   `?calib` + void/frame-vacío), sin LLM. Se corre ANTES del critic.
 - `reference/critic-ensemble.md` — **Gate 1 robusto**: anclar el critic al estilo, verificar
