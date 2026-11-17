@@ -66,7 +66,24 @@ código ni tu razonamiento ni el spec.
    SÓLO las imágenes + la rúbrica de `reference/critic-protocol.md`. No incluyas rutas de
    código, ni el spec, ni qué intentabas lograr. Pídele defectos **priorizados y concretos**
    con severidad (blocker / major / minor) y ubicación (qué pose / qué momento).
+   **Rúbrica de calidad POSITIVA (P1 — postmortem sesión 2).** Medir sólo "ausencia de defectos"
+   hace que el loop converja a *"no está roto"*, nunca a *"es hermoso"* — y que distintas escenas
+   salgan iguales. Además de defectos, pedile al critic un **score 1–10 en cada eje**: dirección
+   de arte, composición/legibilidad, riqueza de materiales/iluminación, y **unicidad** (¿se ve
+   distinta de un "cajas + conos + niebla" genérico, con una técnica firma reconocible?). El gate
+   no sólo exige "nada > minor", también que el **score suba ronda a ronda** y no esté en un piso
+   bajo. Si el score no mejora dos rondas seguidas, no es falta de parches: es falta de técnica/
+   dirección de arte → volvé a `scene-build` con un cambio estructural (material, luz, geometría
+   firma), no cosmético.
+   **Check de similitud entre escenas.** Si hay escenas previas, comprobá que ESTA no sea la
+   anterior con otra paleta (mismo toolkit de primitivas). Si se parecen, es un fallo de unicidad
+   (major): exigí a `scene-build` geometría/material/técnica específicos del tema.
 3. **Iterar** (con disciplina anti-thrash):
+   - **Ledger persistente de defectos (no critic amnésico).** Mantené una lista acumulada entre
+     rondas (defecto → estado: abierto/arreglado/inherente/falso-positivo). El critic nuevo de
+     cada ronda da imparcialidad, pero VOS llevás el ledger: confirmá que los de la ronda previa
+     se cerraron y que no reaparecen. Sin ledger, el loop hace whack-a-mole (cada ronda inventa
+     majors nuevos y el piso de calidad nunca sube).
    - Clasificá cada finding en: *arreglable* / *inherente-al-estilo* / *falso-positivo del
      critic* (ver nota de hipótesis). Sólo actuá sobre los *arreglables*.
    - **Causa raíz, no parche repetido**: si el mismo defecto reaparece ≥2 rondas, **parar de

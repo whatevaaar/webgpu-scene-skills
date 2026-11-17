@@ -16,6 +16,22 @@ PRIORITIES (in this order when they conflict)
 2. Stable frame pacing at the target spec
 3. Small bundle size
 
+FIDELITY CEILING: stylized-minimalist procedural (not photoreal). Flat-shaded matte surfaces,
+hard-edged emissive and blocky/low-poly geometry are acceptable ONLY when composition, color,
+lighting and motion are excellent — the ceiling is NOT a license for low effort. The critic
+must not demand photorealism, but SHOULD demand strong art direction, material depth and a look
+distinct from other scenes.
+
+VISUAL SIGNATURE: {{1-2 render techniques unique to this theme that make it memorable and
+unmistakable from other scenes — e.g. projected caustics + refraction, heat-shimmer + dune
+ripples, wet reflections + puddle roughness}}
+
+ART REFERENCE: {{one concrete aesthetic reference to anchor art direction — e.g. "Subnautica",
+"Moebius", "Blade Runner 2049"}}
+
+HERO ELEMENTS: {{the 3-4 elements that MUST look spectacular — the build spends its effort here;
+everything else is atmospheric filler. Depth over breadth.}}
+
 CONSTRAINTS
 - No Three.js/Babylon.js or other engines.
 - WebGPU rendered.

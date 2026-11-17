@@ -56,6 +56,24 @@ default submarino**: varias especies/props por categoría, un gradiente de color
 ≥1 sistema de partículas, 1–3 set pieces con descripción, y límites del mundo resueltos.
 Donde falte, añade tú detalle coherente y anótalo como "(auto)".
 
+### 2.5 Firma visual, referencia y hero elements (clave para que NO salgan todas iguales)
+> **Por qué (postmortem sesión 2).** Specs ricos en prosa producían escenas idénticas porque
+> `scene-build` colapsaba todo al mismo toolkit (cubos+conos+sprites). Para romper eso, el spec
+> debe **dirigir** la calidad y la unicidad, no sólo listar contenido.
+
+Antes de escribir, definí (proponé vos, el usuario curetea):
+- **VISUAL SIGNATURE** — la(s) **1–2 técnicas de render únicas** que harán esta escena memorable
+  e inconfundible de otras (p.ej. submarino → caústicas proyectadas + refracción; desierto →
+  heat-shimmer + dunas con ripples de viento; neón-lluvia → reflejos húmedos + roughness mojada).
+  Esto es lo que distingue el tema a nivel de *técnica*, no sólo de paleta.
+- **ART REFERENCE** — 1 referencia estética concreta que evoque el look buscado ("tipo
+  Subnautica", "tipo Moebius", "tipo Blade Runner 2049") para anclar la dirección de arte.
+- **HERO ELEMENTS** — los **3–4 elementos que DEBEN verse espectaculares** (el build pondrá su
+  esfuerzo ahí). El resto es relleno atmosférico.
+- **Anti-maximalismo (profundidad > amplitud).** Si el usuario quiere "todo", guialo a priorizar:
+  es mejor un spec de 4 elementos ejecutables de forma excelente que 15 a medias. Marcá
+  explícitamente qué es hero y qué es relleno.
+
 ### 3. TARGET (hardware y presupuesto)
 El contrato técnico (prioridades, constraints, verificación, controles) es **invariante** —
 se copia tal cual para cualquier escena. Lo único parametrizable es el bloque TARGET

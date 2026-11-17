@@ -44,11 +44,36 @@ Lee `reference/webgpu-architecture.md` y `reference/performance.md` antes de esc
 4. **Presupuesto**: respeta el TARGET. Usa instancing y compute para multitudes; LOD/culling
    para densidad; evita overdraw en los volumétricos.
 
+## Calidad visual y unicidad (P1 — postmortem sesión 2)
+> **Por qué.** Dos escenas de temas distintos (biblioteca borgesiana vs. ciudad inundada)
+> salieron **arquitectónicamente idénticas**: cubos (edificios) + conos (vegetación) + sprites
+> (partículas) + grid de ventanas + niebla de 2 colores + god rays + ACES/bloom. El tema sólo
+> cambió la paleta. Un toolkit fijo produce, inevitablemente, la misma escena con otro color.
+> Evitalo deliberadamente:
+
+- **No colapses todo al mismo toolkit.** Antes de reusar "cubo+cono+sprite", preguntate qué
+  geometría es *específica de ESTE tema*. Implementá las **HERO ELEMENTS** y la **VISUAL
+  SIGNATURE** del spec con técnica propia, no con la primitiva genérica de turno.
+- **Profundidad > amplitud (hero elements).** Mejor 3–4 elementos que se vean espectaculares que
+  15 crudos. Si el spec es maximalista, prioridad a los hero elements; el resto, de relleno.
+- **Materiales reales, no sólo flat + emisivo.** Usá al menos: fresnel/rim, algo de specular,
+  oclusión/AO barata (SSAO aproximado o AO por vértice/altura), y **texturas procedurales**
+  (ruido triplanar, detail normals) sobre superficies grandes para que no sean planos lisos.
+- **Luz con forma.** Más allá de una direccional + ambiente: sombras baratas (shadow map simple
+  o contact-shadow), luces locales emisivas que iluminen su entorno, variación de luz por zona.
+- **Técnica firma por tema.** Implementá la(s) 1–2 técnicas de la VISUAL SIGNATURE (p.ej.
+  submarino → caústicas proyectadas + refracción/distorsión; desierto → heat-shimmer + ripples;
+  neón-lluvia → reflejos húmedos + wet roughness). Es lo que hace la escena memorable y distinta.
+
 ## Chequeos obligatorios antes de entregar
 - [ ] Sólo `index.html`, sin fetch/CDN/assets externos.
 - [ ] Cero asignaciones por frame (revisa el cuerpo del rAF: sin `new`, `[]`, `{}`, `map`,
       template strings; scratch vectors/matrices preasignados y reutilizados).
-- [ ] Controles completos y pointer lock funcionando.
+- [ ] Controles completos y pointer lock funcionando. **(P0, bug real)** Ningún overlay
+      (`#msg`, `#hud`, loaders a pantalla completa con `position:fixed; inset:0`) debe tapar el
+      canvas: TODOS llevan `pointer-events:none`, o se comen el click y `requestPointerLock()`
+      nunca dispara → el mouse no gira la vista. Verificá con
+      `document.elementFromPoint(innerWidth/2, innerHeight/2) === canvas`.
 - [ ] Todos los elementos del SCENE presentes.
 - [ ] Hooks para verificación: poses de cámara fijas, modo fly-through scripteado y timestamp
       queries de GPU expuestos para `/scene-verify` (ver abajo).

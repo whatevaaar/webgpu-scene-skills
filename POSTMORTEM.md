@@ -199,3 +199,77 @@ vale la pena institucionalizar: **verificar corrección (mecánica, barata, dete
 de verificar belleza (estética, cara, subjetiva)** — y cuando un síntoma reaparece, buscar la
 causa raíz en vez de subir la dosis del parche. Un check de orientación de 10 líneas habría
 ahorrado la parte más cara de esta sesión.
+
+---
+
+# Sesión 2 — "Ciudad inundada" (2026-11-16)
+
+Segunda corrida de punta a punta con un tema nuevo (metrópolis submarina). Gate 0 y Gate 2
+pasaron limpio; el critic convergió de *blocker + 6 majors* a pulido en 6 rondas. Pero el
+usuario señaló tres problemas de fondo que el pipeline **no** está resolviendo: los resultados
+son **(a) low-quality, (b) parecidos entre sí, y (c) de baja calidad visual pese a buen
+frame-time**. Esta sección documenta la causa raíz y los cambios aplicados a los skills.
+
+## S2.1 — Hallazgo central: TODAS las escenas salen iguales
+
+Comparando el `index.html` de la biblioteca borgesiana (sesión 1.5) con el de la ciudad
+inundada, son **arquitectónicamente idénticos**: cubos instanciados (edificios), conos
+instanciados (coral/vegetación), quads sprite (partículas), shader de grid de ventanas
+emisivas, flock + criatura hero + partículas, niebla de 2 colores, god rays, ACES + bloom +
+dither. **El tema sólo cambia la paleta y unos parámetros.** Cualquier prompt —submarino,
+desierto, cyberpunk— colapsa al mismo *"cajas brillantes + conos + niebla"*.
+
+Causa raíz: `scene-build` tiene un **toolkit fijo de primitivas** y un pipeline genérico, y su
+único listón es "cero asignaciones/frame + todos los elementos del SCENE presentes" — **verifica
+presencia, no belleza ni unicidad**. Reusar el andamiaje anterior es, de hecho, lo que el skill
+invita a hacer.
+
+## S2.2 — El "techo de fidelidad" es una profecía autocumplida
+
+El `spec-template` hace que cada escena declare *"stylized-minimalist, flat-shaded"*, y luego
+`scene-verify` le PROHÍBE al critic marcar justamente lo que subiría la calidad (textura,
+material, detalle geométrico, sombras). Resultado: el loop converge a *"no está roto"*, nunca a
+*"es hermoso"*. El techo, pensado para evitar que un critic exija fotorrealismo imposible, se
+convirtió en **licencia para esfuerzo bajo**.
+
+## S2.3 — El critic amnésico hace whack-a-mole
+
+Cada ronda usa un critic nuevo (bien, para imparcialidad) pero **sin ledger persistente**: cada
+ronda inventa majors nuevos en vez de confirmar que el piso de calidad sube. Tras 6 rondas
+seguía encontrando "majors" distintos. Mide **ausencia de defectos**, no **presencia de
+calidad** (dirección de arte, composición, riqueza material, unicidad frente a otras escenas).
+
+## S2.4 — Incidente: el mouse nunca giró la vista (bug del patrón generado)
+
+En AMBAS escenas el pointer-lock no funcionaba. Causa raíz: el overlay `#msg`
+(`position:fixed; inset:0`) **sin `pointer-events:none`** cubre todo el viewport y se come el
+click del canvas → `requestPointerLock()` nunca se dispara. Confirmado con
+`document.elementFromPoint(centro)` → devolvía `#msg`, no el `<canvas>`. Un check de 1 línea
+(elementFromPoint en el centro === canvas) lo hubiera atrapado. Es un bug del **patrón que
+genera `scene-build`**, no de una escena puntual — otra vez, correctitud mecánica barata que el
+critic estético jamás iba a priorizar.
+
+## S2.5 — Cambios aplicados a los skills (P0/P1 de esta sesión)
+
+- **scene-spec**: nueva sección obligatoria **VISUAL SIGNATURE** (1–2 técnicas de render únicas
+  del tema) + **ART REFERENCE** + **HERO ELEMENTS** (3–4 elementos que deben verse
+  espectaculares), y anti-maximalismo (profundidad > amplitud).
+- **spec-template**: el FIDELITY CEILING se reformula — flat-shading es aceptable **sólo si**
+  composición, color, luz y movimiento son excelentes; NO es licencia para esfuerzo bajo.
+  Añadidos campos VISUAL SIGNATURE / ART REFERENCE / HERO ELEMENTS.
+- **scene-build**: (P0) overlays con `pointer-events:none` + check de `elementFromPoint`; (P1)
+  **no colapsar todo al mismo toolkit** — geometría específica del tema, materiales reales
+  (fresnel/spec/AO barato, texturas procedurales triplanares), 1–2 técnicas firma, y principio
+  de **hero elements** (pocos elementos excelentes > muchos crudos).
+- **scene-verify**: (P1) **rúbrica de calidad POSITIVA** en Gate 1 (arte, composición,
+  materiales, unicidad) con score que debe SUBIR ronda a ronda; **ledger de defectos
+  persistente** entre rondas; **check de similitud entre escenas**; y el techo de fidelidad
+  reformulado igual que en el template.
+
+## S2.6 — Lección central de la sesión 2
+
+La sesión 1 institucionalizó *"correctitud antes que belleza"*. La sesión 2 añade: **el pipeline
+optimiza lo que mide, y sólo mide corrección y presencia — no unicidad ni riqueza.** Para que
+las escenas dejen de parecerse y suban de calidad, hay que **medir calidad positiva y unicidad
+explícitamente**, y **quitar el techo de fidelidad como excusa**. Un renderer con toolkit fijo
+produce, inevitablemente, la misma escena con otra paleta.
