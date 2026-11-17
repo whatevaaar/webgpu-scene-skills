@@ -9,8 +9,13 @@ Toma un `scene-spec.md` y produce un **único `index.html` autocontenido** que c
 contrato técnico. La interacción es en español; el código y los comentarios, en inglés.
 
 ## Entrada
-- Busca `scene-spec.md` en el directorio de trabajo. Si no existe, dile al usuario que corra
-  `/scene-spec` primero (o ofrécete a correrlo).
+- **Una carpeta por escena (obligatorio).** Cada escena vive en su propia subcarpeta
+  (`scenes/<slug>/`, convención de `scene-spec`). Localiza el `scene-spec.md` de la escena a
+  construir dentro de su carpeta y **trabaja ahí dentro**: todos los artefactos (`index.html`,
+  `index.min.html`, renders, logs) van en esa misma carpeta, nunca sueltos en la raíz ni en el
+  repo de skills. Si hay varias carpetas de escena, pregunta al usuario cuál construir.
+- Si no existe ningún `scene-spec.md`, dile al usuario que corra `/scene-spec` primero (o
+  ofrécete a correrlo).
 - Lee el spec entero. El bloque SCENE define QUÉ construir; CONSTRAINTS/TARGET definen CÓMO.
 
 ## Contrato técnico (no negociable)
@@ -91,7 +96,8 @@ Deja estos ganchos para que `/scene-verify` funcione sin tocar la lógica de ren
   confiar en las poses.
 
 ## Entrega
-Escribe `index.html` en el directorio de trabajo. Luego:
+Escribe `index.html` en la **carpeta de la escena** (`scenes/<slug>/`, junto al
+`scene-spec.md`). Luego:
 - Minifica mentalmente/realmente para **reportar el tamaño minificado** (y el crudo). Si
   minificas, guarda el minificado como `index.min.html` y conserva `index.html` legible.
 - Resume en español: capas implementadas, tamaño (crudo + minificado), y "Siguiente paso:

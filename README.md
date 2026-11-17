@@ -25,10 +25,14 @@ alcanza en una sola sesión.
 ## Flujo
 
 ```
-/scene-spec   →  scene-spec.md   (drill-down en español → spec técnico en inglés)
-/scene-build  →  index.html      (render WebGPU, procedural, 0 asignaciones/frame)
-/scene-verify →  veredicto        (critic visual aislado + gate de performance)
+/scene-spec   →  scenes/<slug>/scene-spec.md   (drill-down en español → spec técnico en inglés)
+/scene-build  →  scenes/<slug>/index.html      (render WebGPU, procedural, 0 asignaciones/frame)
+/scene-verify →  veredicto + renders           (critic visual aislado + gate de performance)
 ```
+
+> **Una carpeta por escena.** Cada escena vive en su propia subcarpeta `scenes/<slug>/` (slug
+> derivado del concepto). Spec, `index.html`, renders y logs de esa escena viven ahí dentro;
+> nunca sueltos en la raíz del workspace ni dentro del repo de skills.
 
 1. **`/scene-spec`** — Sesión de *drill-down*: a partir de una idea mínima (hasta una palabra),
    propone detalles concretos y temáticos en 10 dimensiones y **extrapola** una escena tan rica

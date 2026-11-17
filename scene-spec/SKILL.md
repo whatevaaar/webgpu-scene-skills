@@ -68,14 +68,23 @@ se copia tal cual para cualquier escena. Lo único parametrizable es el bloque T
 Pregunta sólo si el usuario quiere otra máquina/resolución/presupuesto; si no, usa el default.
 
 ### 4. Escribir el spec
+**Una carpeta por escena (obligatorio).** Cada escena vive en su **propia subcarpeta
+dedicada** — nunca escribas los artefactos sueltos en la raíz del directorio de trabajo, y
+jamás dentro del repo de skills. Deriva un slug kebab-case del concepto (p.ej. "ciudad
+inundada" → `sunken-city`) y crea `scenes/<slug>/` bajo el directorio de trabajo actual (si
+ya existe una carpeta de escenas convenida, úsala). Todos los artefactos de esta escena
+(`scene-spec.md`, `index.html`, `index.min.html`, renders, logs) van **dentro de esa
+carpeta**.
+
 Rellena `reference/spec-template.md` con todo lo recogido y escribe el resultado en
-`scene-spec.md` en el directorio de trabajo actual. Muestra al usuario un resumen corto (no
-el documento entero) y el path. El SCENE va en inglés, denso y concreto, al estilo del
+`scenes/<slug>/scene-spec.md`. Muestra al usuario un resumen corto (no el documento entero) y
+el path completo de la carpeta. El SCENE va en inglés, denso y concreto, al estilo del
 default.
 
 ### 5. Entregar
-Termina indicando: "Spec listo en `scene-spec.md`. Siguiente paso: `/scene-build` para
-generar el index.html." No construyas nada aquí — esta skill sólo especifica.
+Termina indicando: "Spec listo en `scenes/<slug>/scene-spec.md`. Siguiente paso: `/scene-build`
+para generar el index.html en esa misma carpeta." No construyas nada aquí — esta skill sólo
+especifica.
 
 ## Archivos de apoyo
 - `reference/dimensions.md` — las 10 dimensiones del drill-down, con mapeo al ejemplo y

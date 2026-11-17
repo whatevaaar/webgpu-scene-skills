@@ -9,11 +9,17 @@ Corre los **dos gates** del spec sobre el `index.html` construido y entrega el v
 Interacción en español. El critic trabaja en el idioma que prefiera; traduce su salida.
 
 ## Entradas
-- `index.html` (o `index.min.html`) en el directorio de trabajo, con los hooks de
+- **Una carpeta por escena (obligatorio).** La escena vive en su propia subcarpeta
+  (`scenes/<slug>/`, convención de `scene-spec`/`scene-build`). Opera dentro de esa carpeta:
+  lee el `index.html` de ahí y **escribe todos los artefactos de verificación** (renders
+  `pose0.png`…`pose5.png`, grabación del fly-through, logs de perf) **dentro de esa misma
+  carpeta** — nunca sueltos en la raíz ni en el repo de skills. Si hay varias carpetas de
+  escena, pregunta al usuario cuál verificar.
+- `index.html` (o `index.min.html`) en la carpeta de la escena, con los hooks de
   `scene-build` (`?pose=N`, `?flythrough=1`, `window.__perf()`, `window.__frameLog`,
   `window.__ready`).
-- `scene-spec.md` para leer el TARGET (resolución, presupuesto de ms, duración) — pero **nunca
-  se lo pases al critic**.
+- `scene-spec.md` (en la misma carpeta) para leer el TARGET (resolución, presupuesto de ms,
+  duración) — pero **nunca se lo pases al critic**.
 
 Si faltan los hooks, pídele a `scene-build` que los añada antes de verificar.
 
