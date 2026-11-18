@@ -45,7 +45,18 @@ con ventana real.
 > - **Iluminación**: god rays/cáusticas creíbles, sin artefactos de banda ni doble imagen.
 > - **Composición y legibilidad**: foco, contraste, silueta, sensación de escala.
 > - **Coherencia de movimiento** (vídeo): ghosting de TAA, stepping, deriva no natural.
-> - **Materiales**: iridiscencia/brillo convincentes, sin planos planos o repetición obvia.
+> - **Materiales**: coherentes y COMPLETOS para la dirección elegida; sin efectos a medias.
+> - **Factura — NO juzgues "cuán realista" (te paso la DIRECCIÓN: stylized o realista aparte).**
+>   A cualquier fidelidad, NO marques un estilo como defecto por ser ese estilo (ni el flat/cel/
+>   low-poly, ni el realista), y NO exijas fotorrealismo. SÍ marcá, como defectos de primer orden:
+>   - **Medio-compromiso / uncanny:** realismo a medias — ruido en albedo fingiendo textura, SSS/
+>     fresnel/god-rays difusos, niebla lechosa que lava el contraste, specular plástico sobre lambert.
+>     (El uncanny viene de hacerlo *a medias*, no del realismo.)
+>   - **Geometría genérica de reemplazo (homogeneización):** criaturas/objetos que son una primitiva
+>     en vez del sujeto — pez=óvalo, pájaro=triángulo, edificio=caja sin rasgos, árbol=cono, todo=
+>     esfera. Pedí que cada criatura/hero element se lea como ESE sujeto (aletas, alas, aleros…),
+>     sea estilizado o detallado. Low-poly NO es excusa para genérico.
+>   - **Incoherencia / look genérico:** una escena que se ve como cualquier "primitivas + niebla".
 > Devuelve: lista priorizada (severidad + ubicación + fix sugerido) y un veredicto global.
 
 ## Escala de severidad y criterio de salida

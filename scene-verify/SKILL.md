@@ -35,6 +35,11 @@ Puppeteer + pngjs, sin LLM, ~1 min, gratis):
 ```
 node reference/gate0-metrics.js "file:///ABS/PATH/index.html"
 ```
+> **Deps/entorno (Windows).** `gate0-metrics.js` y `record-video.js` necesitan `puppeteer-core`
+> + `pngjs` y un navegador (Edge por defecto; override con `BROWSER_PATH`). Si el dir de skills es
+> un symlink, Node resuelve `node_modules` desde la ruta real del script: instalá las deps en la
+> carpeta de la escena y corré con `NODE_PATH=<escena>/node_modules …`, o instalalas junto al
+> script en el repo de skills.
 Verifica mecánicamente, de forma determinista:
 1. **Orientación**: con `?calib=1` el motor dibuja 3 marcadores de color (verde=UP, rojo=DOWN,
    amarillo=+X derecha). El script lee sus centroides y afirma que arriba está arriba y que +X
@@ -54,8 +59,14 @@ código ni tu razonamiento ni el spec.
 > seguridad "no hay fog / sin bloom / sin AA" cuando el código SÍ los tiene — lee un estilo
 > flat-shaded procedural como "roto". Antes de "arreglar" un claim, **verificalo contra el
 > código** (grep del feature). Si el feature existe, es percepción/estilo, no bug → no lo
-> persigas. Pasale al critic el **estilo pretendido** y qué NO marcar como defecto por ser
-> inherente a ese estilo (ver el techo de fidelidad en el spec).
+> persigas. Pasale al critic el **FIDELITY TARGET (dirección) del spec** como ancla, pero el critic
+> NO juzga "cuán realista": juzga **compromiso + especificidad temática**. Reglas, a CUALQUIER
+> fidelidad: (a) NO marcar un estilo elegido (stylized o realista) como defecto por ser ese estilo;
+> (b) NO exigir fotorrealismo; (c) SÍ marcar como defecto el **medio-compromiso/uncanny** (realismo
+> a medias: ruido en albedo, SSS/god-rays difusos, niebla lechosa, specular plástico sobre lambert)
+> y la **geometría genérica de reemplazo** (pez=óvalo, pájaro=triángulo, edificio=caja sin rasgos,
+> todo=esfera) que hace que la escena se parezca a cualquier otra. Un estilizado comprometido y uno
+> realista completo son ambos válidos; un medio-realismo o un genérico, no.
 
 1. **Capturar** (ver `reference/critic-protocol.md` para comandos concretos):
    - Las **6 poses fijas** a la resolución del TARGET (2560×1440 por defecto), en Chrome con
@@ -69,11 +80,13 @@ código ni tu razonamiento ni el spec.
    **Rúbrica de calidad POSITIVA (P1 — postmortem sesión 2).** Medir sólo "ausencia de defectos"
    hace que el loop converja a *"no está roto"*, nunca a *"es hermoso"* — y que distintas escenas
    salgan iguales. Además de defectos, pedile al critic un **score 1–10 en cada eje**: dirección
-   de arte, composición/legibilidad, riqueza de materiales/iluminación, y **unicidad** (¿se ve
-   distinta de un "cajas + conos + niebla" genérico, con una técnica firma reconocible?). El gate
-   no sólo exige "nada > minor", también que el **score suba ronda a ronda** y no esté en un piso
-   bajo. Si el score no mejora dos rondas seguidas, no es falta de parches: es falta de técnica/
-   dirección de arte → volvé a `scene-build` con un cambio estructural (material, luz, geometría
+   de arte, composición/legibilidad, **compromiso y factura** (¿está todo ejecutado entero, sin
+   efectos a medias? — NO "cuán realista es"), y **especificidad/unicidad** (¿las criaturas y hero
+   elements están modelados al sujeto, y la escena se ve distinta de un genérico "primitivas +
+   niebla"?). El gate no sólo exige "nada > minor", también que el **score suba ronda a ronda**.
+   **El techo escala con los ciclos:** no conviertas el loop en converger a un piso — con ciclos
+   disponibles, empujá MÁS ambición/especificidad. Si el score se estanca dos rondas, NO bajes la
+   vara: es falta de craft específico → volvé a `scene-build` con un cambio estructural (geometría
    firma), no cosmético.
    **Check de similitud entre escenas.** Si hay escenas previas, comprobá que ESTA no sea la
    anterior con otra paleta (mismo toolkit de primitivas). Si se parecen, es un fallo de unicidad
@@ -91,10 +104,14 @@ código ni tu razonamiento ni el spec.
      la fuente. Un síntoma recurrente es señal de causa raíz, no de "subir la dosis del parche".
    - Llevá los *arreglables* ≥ major a `scene-build`, re-renderizá y re-evaluá con un critic
      **nuevo** (sin memoria de la ronda anterior).
-   - **Presupuesto explícito**: fijá un tope de rondas/tokens para el loop visual y una
-     definición de "suficientemente bueno" acorde al **techo de fidelidad del spec** (un
-     renderer procedural minimalista no va a pasar un critic que exige fotorrealismo — eso es
-     límite del estilo, no defecto). Pará al llegar al tope y reportá honestamente.
+   - **Presupuesto de ciclos = techo, no tope de ambición.** Usá el CYCLE CEILING del spec: con
+     muchos ciclos, "listo" exige MÁS especificidad y compromiso ronda a ronda, no menos. "Listo" =
+     la dirección elegida ejecutada ENTERA (sin efectos a medias), criaturas/hero elements modelados
+     al sujeto (no primitivas genéricas), y nada > minor — a la fidelidad que el spec pidió. Si se
+     estanca primitivo/genérico o a-medias, es cambio estructural pendiente en `scene-build`, no un
+     techo de la herramienta. Un render que necesita muchos ciclos para llegar alto es esperable y
+     válido; no bajes la vara para cerrar rápido. Pará sólo al agotar el presupuesto de ciclos del
+     spec, y reportá honestamente qué quedó.
 
 ## Gate 2 — Rendimiento
 Objetivo: frame pacing estable en el TARGET.
@@ -103,10 +120,21 @@ Objetivo: frame pacing estable en el TARGET.
    TARGET, en Chrome acelerado (ver `reference/perf-protocol.md`).
 2. Recoge `window.__perf()` → **avg, p99, max** (preferir GPU timestamp; si no hay, CPU
    `performance.now`). Opcionalmente vuelca `window.__frameLog`.
-3. **Criterio de aprobado** (del spec, por defecto): GPU frame time **≤ 11 ms promedio** y
+3. **CONSCIENCIA DE HARDWARE (obligatorio).** El budget (≤11 ms avg / ≤16.7 ms max) es para la
+   **GPU del TARGET del spec** (p.ej. RTX 5070 Ti). Antes de dar un veredicto, determiná la GPU de
+   la máquina de verificación (`adapter.info`/`requestAdapterInfo`, o reportá "desconocida"):
+   - Si la GPU de verificación **es** la del TARGET → aplicá el criterio tal cual (PASS/FAIL).
+   - Si **no lo es** → NO declares FAIL contra un budget de otra GPU. Reportá los números crudos +
+     la GPU real + la resolución, marcá **"no verificable en este hardware"**, y si querés una
+     señal, compará contra un budget escalado o reportá FPS. Lo que SÍ es válido en cualquier
+     hardware: **estabilidad de pacing** (max/avg, p99, picos periódicos = GC stutter) y el
+     **ranking relativo** entre iteraciones. No gastes ciclos "optimizando" para una GPU que no es
+     la del spec salvo que el pacing (no el promedio absoluto) esté roto.
+4. **Criterio de aprobado** (en el hardware del TARGET): GPU frame time **≤ 11 ms promedio** y
    **ningún frame > 16.7 ms**. Reporta también p99.
-4. Si no cumple: identifica la capa culpable (desactiva capas vía query flags o pide profiling a
-   `scene-build`), optimiza y vuelve a medir.
+5. Si no cumple (en hardware del target): identificá la capa culpable (desactivá capas vía query
+   flags o pedí profiling a `scene-build`), optimizá y volvé a medir. Recordá: un efecto que no
+   entra en budget se **corta o reemplaza**, no se deja a media resolución feo.
 
 ## Entrega (DONE WHEN)
 Los **tres** gates deben pasar (0 mecánico → 1 critic → 2 perf). Entrega en español:

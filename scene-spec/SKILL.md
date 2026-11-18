@@ -62,6 +62,26 @@ Donde falte, añade tú detalle coherente y anótalo como "(auto)".
 > debe **dirigir** la calidad y la unicidad, no sólo listar contenido.
 
 Antes de escribir, definí (proponé vos, el usuario curetea):
+- **FIDELITY TARGET** — una DIRECCIÓN elegida por tema en el drill-down. **Ni "stylized" ni
+  "realistic" son el default; ninguno es "mejor".** El eje NO es realismo↔low-poly.
+  > **Por qué (postmortem sesión 3→4).** Ni "realismo por default" ni "low-poly por default"
+  > sirven. Forzar realismo → valle inquietante amateur (realismo a medias). Pero forzar low-poly
+  > repite el fallo de la sesión 2 (todo se parece: pez=óvalo, pájaro=triángulo, todo=esfera) y
+  > pone un **techo bajo fijo** sin importar cuántos ciclos invirtamos. Los dos fallos reales son
+  > independientes del estilo: **(1) medio-compromiso** (el uncanny viene del realismo *a medias*,
+  > no del realismo) y **(2) toolkit genérico fijo** (homogeneíza). Diseñá contra ESOS, no contra
+  > el realismo.
+  - **Elegí dirección y comprometela entera.** stylized (cel/flat/gradiente, color bold, luz
+    fuerte, siluetas limpias) *o* realistic (SDF, shadow map+SSAO, PBR). Ambos válidos. Uncanny =
+    a medias → cada efecto se ejecuta convincente o se corta, nunca a mitad.
+  - **Modelá al sujeto, nunca una primitiva de reemplazo — a cualquier fidelidad.** Koi =
+    cuerpo+aletas+cola; grulla = alas+cuello+patas; pagoda = aleros+ménsulas. Low-poly ≠ genérico:
+    un koi low-poly sigue siendo inconfundiblemente un koi. Esto es lo que evita que todo se parezca.
+  - **CYCLE CEILING:** fijá hasta dónde empuja el loop. **El techo escala con los ciclos** — más
+    revisiones = geometría/técnica más específica y MÁS ambición; un plateau significa "más craft
+    específico del sujeto", nunca "bajá la vara". Que un render tarde muchos ciclos está bien.
+  Preguntá la dirección Y el techo de ciclos. Esto fija el FIDELITY TARGET del spec y la vara del
+  critic en `scene-verify` (que juzga compromiso + especificidad, no cercanía al realismo).
 - **VISUAL SIGNATURE** — la(s) **1–2 técnicas de render únicas** que harán esta escena memorable
   e inconfundible de otras (p.ej. submarino → caústicas proyectadas + refracción; desierto →
   heat-shimmer + dunas con ripples de viento; neón-lluvia → reflejos húmedos + roughness mojada).

@@ -16,7 +16,8 @@ contrato técnico. La interacción es en español; el código y los comentarios,
   repo de skills. Si hay varias carpetas de escena, pregunta al usuario cuál construir.
 - Si no existe ningún `scene-spec.md`, dile al usuario que corra `/scene-spec` primero (o
   ofrécete a correrlo).
-- Lee el spec entero. El bloque SCENE define QUÉ construir; CONSTRAINTS/TARGET definen CÓMO.
+- Lee el spec entero. El bloque SCENE define QUÉ construir; CONSTRAINTS/TARGET definen CÓMO; el
+  **FIDELITY TARGET** define el nivel de factura visual (default: advanced — ver abajo).
 
 ## Contrato técnico (no negociable)
 1. **Un solo `index.html`**, autocontenido. Sin dependencias externas, sin CDNs, sin assets.
@@ -51,14 +52,32 @@ Lee `reference/webgpu-architecture.md` y `reference/performance.md` antes de esc
 > cambió la paleta. Un toolkit fijo produce, inevitablemente, la misma escena con otro color.
 > Evitalo deliberadamente:
 
-- **No colapses todo al mismo toolkit.** Antes de reusar "cubo+cono+sprite", preguntate qué
-  geometría es *específica de ESTE tema*. Implementá las **HERO ELEMENTS** y la **VISUAL
-  SIGNATURE** del spec con técnica propia, no con la primitiva genérica de turno.
-- **Profundidad > amplitud (hero elements).** Mejor 3–4 elementos que se vean espectaculares que
-  15 crudos. Si el spec es maximalista, prioridad a los hero elements; el resto, de relleno.
-- **Materiales reales, no sólo flat + emisivo.** Usá al menos: fresnel/rim, algo de specular,
-  oclusión/AO barata (SSAO aproximado o AO por vértice/altura), y **texturas procedurales**
-  (ruido triplanar, detail normals) sobre superficies grandes para que no sean planos lisos.
+- **Respetá el FIDELITY TARGET del spec — es una DIRECCIÓN (stylized o realistic), no un piso.**
+  > **Por qué (postmortem sesión 3→4).** El eje NO es realismo↔low-poly. Dos fallos reales,
+  > independientes del estilo: **(1) medio-compromiso** → uncanny (el realismo *a medias* es lo
+  > feo, no el realismo); **(2) toolkit genérico** → todo se parece. No evites el uncanny "yendo
+  > más simple": eso solo baja el techo y homogeneíza. Evitá el uncanny **comprometiéndote entero**.
+  - **Comprometé la dirección entera.** Sea stylized o realistic, cada efecto se ejecuta
+    convincente o se corta — **nunca a medias**. Si no podés hacer un efecto COMPLETO dentro del
+    budget, no lo pongas a medias: cortalo o reemplazalo por uno que sí cierre.
+  - **Modelá al sujeto, nunca una primitiva de reemplazo — a CUALQUIER fidelidad.** Un pez tiene
+    cuerpo+aletas+cola (no un óvalo), un pájaro alas+cuerpo (no un triángulo), un árbol tronco+
+    ramas+copa. Low-poly ≠ genérico: un koi low-poly sigue siendo un koi. Esto —no el estilo— es lo
+    que hace que dos escenas de temas distintos NO salgan idénticas.
+  - **El techo escala con los ciclos del spec (CYCLE CEILING).** Con presupuesto de muchos ciclos,
+    subí la ambición ronda a ronda (geometría más específica, técnica firma más lograda). Un
+    plateau = más craft específico, no bajar la vara. No hay problema con que un render tarde.
+  - Síntomas de medio-compromiso a EVITAR (no porque sean "realismo", sino porque están *a medias*):
+    ruido FBM en albedo fingiendo textura, SSS/fresnel a medias en todo, god-rays difusos tipo
+    mancha, niebla lechosa que lava el contraste, specular plástico sobre lambert.
+- **No colapses todo al mismo toolkit.** Antes de reusar "cubo+cono+sprite/óvalo/triángulo",
+  preguntate qué geometría es *específica de ESTE sujeto*. Implementá HERO ELEMENTS, criaturas y
+  VISUAL SIGNATURE con geometría propia del tema, no con la primitiva genérica de turno.
+- **Profundidad > amplitud (hero elements).** Mejor 3–4 elementos específicos y comprometidos que
+  15 primitivas genéricas. Si el spec es maximalista, prioridad a los hero elements.
+- **Materiales: comprometidos y coherentes con la dirección.** stylized → color cohesivo + banda
+  de luz/sombra nítida + AO de contacto. realistic → fresnel/specular/detail-normals COMPLETOS. En
+  ambos, nunca a medias, y la **LUZ y la COMPOSICIÓN** hacen el trabajo pesado.
 - **Luz con forma.** Más allá de una direccional + ambiente: sombras baratas (shadow map simple
   o contact-shadow), luces locales emisivas que iluminen su entorno, variación de luz por zona.
 - **Técnica firma por tema.** Implementá la(s) 1–2 técnicas de la VISUAL SIGNATURE (p.ej.
@@ -78,9 +97,18 @@ Lee `reference/webgpu-architecture.md` y `reference/performance.md` antes de esc
 - [ ] Hooks para verificación: poses de cámara fijas, modo fly-through scripteado y timestamp
       queries de GPU expuestos para `/scene-verify` (ver abajo).
 - [ ] Degradación limpia si falta WebGPU o timestamp-query.
+- [ ] **Colisión/clamp aplicada TAMBIÉN al fly-through** (bug real): el spline scripteado debe
+      respetar colisión y clamp de suelo igual que la cámara libre, o la cámara atraviesa el
+      pabellón/paredes en la grabación. No dejes el recorrido metido dentro de geometría sólida.
+- [ ] **HUD/overlays ocultos en modos de captura** (bug real): en `?pose`, `?flythrough` y
+      `?calib`, ocultá `#hud`/`#msg` (`display:none`), o el texto de debug queda quemado en los
+      renders que ve el critic.
+- [ ] **Smoke-test pasado** (ver "Auto-smoke-test" abajo) — NO entregues sin esto.
 
 ## Hooks para la verificación
 Deja estos ganchos para que `/scene-verify` funcione sin tocar la lógica de render:
+- El `<canvas>` debe tener `id="c"` — `record-video.js` de `scene-verify` lo busca por ese id
+  (`canvas.captureStream()`); cualquier otro id rompe el deliverable de video.
 - `?pose=N` (0–5): coloca la cámara en una de **6 poses fijas** y renderiza estático.
 - `?flythrough=1`: ejecuta un **recorrido scripteado de 60 s** determinista (spline de cámara
   fijo, sin input), ideal para grabar y para el log de frame-times.
@@ -104,6 +132,10 @@ Deja estos ganchos para que `/scene-verify` funcione sin tocar la lógica de ren
   - Color puro: en el fragment, override al final (`if(kind==marker){ out = col*2.0 }`) **después**
     de todo uso de `fwidth` — un `return` temprano sobre un valor no-uniforme rompe `fwidth`
     (lección aprendida). Exentos de niebla/ambient/floor para que el centroide de color sea limpio.
+  - **Fondo neutro en calib (robustez del Gate 0):** en modo `?calib`, renderizá el resto de la
+    escena (cielo + geometría no-marcador) en gris neutro-oscuro. Una escena brillante o muy
+    saturada (p.ej. piso dorado) puede colar píxeles en el clasificador de color del marcador y
+    contaminar su centroide → falso FAIL de orientación. Sólo los 3 marcadores deben llevar color.
   - Mantené los marcadores dentro del FOV (offset angular < medio-FOV vertical) o el verde/rojo se
     recortan contra el borde.
   El harness afirma `verde.y < rojo.y` (arriba sobre abajo) y `amarillo.x > centro.x` (+X a la
@@ -119,6 +151,31 @@ Deja estos ganchos para que `/scene-verify` funcione sin tocar la lógica de ren
   cuela un volteo. Deriva `right = normalize(cross(forward, worldUp))` y `up = cross(right,
   forward)`, y verifica con un caso conocido (cámara mirando a −Z ⇒ right=+X, up=+Y) antes de
   confiar en las poses.
+
+## Auto-smoke-test antes de entregar (P0 — no opcional)
+> **Por qué (postmortem sesión 3).** `scene-build` entregó un `index.html` con 4 bugs que dejaban
+> la pantalla en NEGRO (`]);` en vez de `]});`, `type` keyword reservada en WGSL, `struct U` vs
+> binding `U` redeclarado, calib invertida). Los cazó Gate 0 — pero el build debió cazarlos solo.
+> El falso-negativo "lo escribí, debe andar" es caro: una escena que no arranca gasta toda una
+> ronda de captura/critic en nada.
+
+Antes de declarar la entrega, corré un smoke-test headless automático (Node + puppeteer-core +
+el navegador que usa `/scene-verify`). Mínimo:
+1. **Sintaxis JS:** extraé el `<script type="module">` del `index.html` y pasalo por `node --check`.
+   Un error acá = el módulo entero muere (pantalla negra). Arreglalo antes de seguir.
+2. **Carga + WGSL en runtime:** abrí el `index.html` en el navegador headless, escuchá
+   `page.on('console')` y `page.on('pageerror')`, y esperá `window.__ready===true` (timeout ~15 s).
+   - CERO `pageerror`. CERO errores de compilación WGSL en consola ("Error while parsing WGSL",
+     "reserved keyword", "redeclaration", "no matching overload"). Un warning WGSL que impide crear
+     un pipeline = fallo.
+   - `window.__ready===true` dentro del timeout (si nunca se pone en true, algo tira antes del
+     primer frame).
+   - `canvas.width` > 300 (que el resize haya corrido; 300 = default = nunca inicializó).
+3. Idealmente un screenshot y un check barato de "no-void" (no todo negro) — pero eso ya lo hace
+   Gate 0; el mínimo imprescindible es (1)+(2).
+
+Si el smoke-test falla, **arreglá y repetí hasta que pase**; recién ahí entregás. No le pases a
+`/scene-verify` una escena que no arranca.
 
 ## Entrega
 Escribe `index.html` en la **carpeta de la escena** (`scenes/<slug>/`, junto al

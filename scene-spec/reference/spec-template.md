@@ -16,11 +16,37 @@ PRIORITIES (in this order when they conflict)
 2. Stable frame pacing at the target spec
 3. Small bundle size
 
-FIDELITY CEILING: stylized-minimalist procedural (not photoreal). Flat-shaded matte surfaces,
-hard-edged emissive and blocky/low-poly geometry are acceptable ONLY when composition, color,
-lighting and motion are excellent — the ceiling is NOT a license for low effort. The critic
-must not demand photorealism, but SHOULD demand strong art direction, material depth and a look
-distinct from other scenes.
+FIDELITY TARGET: {{FIDELITY — pick a DIRECTION per theme in the drill-down. Both "stylized" and
+"realistic" are legitimate end states; neither is the default and neither is "better". The axis
+that matters is NOT realism-vs-low-poly — it is COMMITMENT + THEME-SPECIFICITY. State the chosen
+direction AND the cycle ceiling (how far the build/verify loop should push).}}
+
+The two real failure modes to design against (both independent of realism-vs-stylized):
+1. HALF-COMMITMENT → uncanny valley. Uncanny comes from realism done partway (fake/half SSS,
+   albedo noise faking detail, diffuse god-ray smears, flat lambert with plastic specular), NOT
+   from realism itself. Rule: every effect is either executed convincingly or cut — never half.
+2. GENERIC FIXED TOOLKIT → homogenization (every theme collapses to box=building, cone=tree,
+   sphere/oval=any-creature, triangle=bird). This is what makes all scenes look the same, and it
+   happens at ANY fidelity. Rule: model hero elements and creatures TO THE SUBJECT — a koi has a
+   body + fins + tail, a crane has wings + neck + legs, a pagoda has eaves + brackets — whether
+   low-poly or detailed. Low-poly ≠ generic: a low-poly koi is still unmistakably a koi.
+
+- stylized: a committed graphic look (cel/flat/gradient shading, bold color, strong light, clean
+  silhouettes). NOT a license for generic primitives — stylized creatures/props must still be
+  specific to the subject, just rendered in a stylized language.
+- realistic: SDF/raymarch, shadow mapping + SSAO, PBR (specular/fresnel/reflection), normal detail.
+  Legitimate and encouraged when the theme calls for it — but it MUST be committed completely;
+  half-realism is the uncanny failure above.
+
+CYCLE CEILING: the ceiling SCALES WITH THE REVIEW BUDGET. More review cycles → pursue MORE specific
+geometry and technique and RAISE ambition; a score plateau means "push for more subject-specific
+craft", never "lower the bar". A render taking many cycles to reach high fidelity is expected and
+fine. Do NOT cap ambition to avoid uncanny — avoid uncanny by committing fully, not by going simpler.
+
+The critic (at any fidelity) must NOT reward realism-proximity and must NOT penalize a chosen style
+for being that style. It SHOULD flag: half-commitment/uncanny, generic primitives standing in for
+hero elements/creatures, a look indistinguishable from a generic "primitives + fog" scene, and
+incoherence. Never demand photorealism.
 
 VISUAL SIGNATURE: {{1-2 render techniques unique to this theme that make it memorable and
 unmistakable from other scenes — e.g. projected caustics + refraction, heat-shimmer + dune

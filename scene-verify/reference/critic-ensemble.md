@@ -9,9 +9,11 @@ Correr **sólo después de que Gate 0 (correctitud mecánica) pase**.
 
 ## 1. Anclar el critic al estilo pretendido
 El prompt del critic (que sólo ve imágenes) debe incluir:
-- El **techo de fidelidad** declarado en el spec (p. ej. "estilizado-minimalista procedural", no
-  fotorrealista). Pedile explícitamente **no marcar como defecto lo inherente a ese estilo**
-  (materiales mate planos, geometría blocky, ventanas emissive sin textura, etc.).
+- El **FIDELITY TARGET** declarado en el spec. Si es **advanced** (default): pedile que EXIJA
+  geometría rica y marque como defecto lo primitivo (cajas/cilindros crudos), los materiales
+  planos lambert y la falta de sombras/AO. Si es **minimalist** (elegido por el usuario): pedile
+  **no marcar como defecto lo inherente a ese estilo** (mate plano, blocky, emissive sin textura).
+  En ningún caso exigir fotorrealismo.
 - Opcional pero potente: una **imagen de referencia / moodboard** del objetivo, para que juzgue
   *relativo a un target* en vez de contra un AAA absoluto.
 - Que **cite una región** por cada defecto (qué pose/zona), para poder verificarlo (abajo).

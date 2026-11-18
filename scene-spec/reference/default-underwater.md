@@ -15,6 +15,15 @@ PRIORITIES (in this order when they conflict)
 2. Stable frame pacing at the target spec
 3. Small bundle size
 
+FIDELITY TARGET: stylized direction, fully committed (clean cel/gradient shading, bold color,
+strong directional light with crisp shadows, cohesive palette). Both stylized and realistic are
+valid choices — this scene picks stylized. Two rules at ANY fidelity: (1) commit every effect
+completely — no half-done realism (albedo noise, half-SSS, diffuse god-rays, milky fog) = the
+uncanny failure; (2) model creatures/hero elements TO THE SUBJECT, never a stand-in primitive —
+the manta has wings, fish have bodies+tails, the kelp sways in strands — stylized but unmistakable,
+never "oval = fish". CYCLE CEILING: push ambition/specificity up as review cycles allow; don't cap
+to stay safe. The critic judges commitment + subject-specificity, not proximity to realism.
+
 CONSTRAINTS
 - No Three.js/Babylon.js or other engines.
 - WebGPU rendered.
