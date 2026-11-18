@@ -30,15 +30,15 @@ Si faltan los hooks, pídele a `scene-build` que los añada antes de verificar.
 > el critic nunca lo priorizó y la vegetación del suelo se leía como "confeti en el techo". Un
 > humano lo vio de un vistazo. **Estos checks son baratos, deterministas y van primero.**
 
-Antes de gastar un solo token de critic, corré **`reference/gate0-metrics.js`** (Node +
+Antes de gastar un solo token de critic, corre **`reference/gate0-metrics.js`** (Node +
 Puppeteer + pngjs, sin LLM, ~1 min, gratis):
 ```
 node reference/gate0-metrics.js "file:///ABS/PATH/index.html"
 ```
 > **Deps/entorno (Windows).** `gate0-metrics.js` y `record-video.js` necesitan `puppeteer-core`
 > + `pngjs` y un navegador (Edge por defecto; override con `BROWSER_PATH`). Si el dir de skills es
-> un symlink, Node resuelve `node_modules` desde la ruta real del script: instalá las deps en la
-> carpeta de la escena y corré con `NODE_PATH=<escena>/node_modules …`, o instalalas junto al
+> un symlink, Node resuelve `node_modules` desde la ruta real del script: instala las deps en la
+> carpeta de la escena y corre con `NODE_PATH=<escena>/node_modules …`, o instálalas junto al
 > script en el repo de skills.
 Verifica mecánicamente, de forma determinista:
 1. **Orientación**: con `?calib=1` el motor dibuja 3 marcadores de color (verde=UP, rojo=DOWN,
@@ -48,7 +48,7 @@ Verifica mecánicamente, de forma determinista:
 2. **Void / frame-vacío** por pose: `darkFrac` (histograma de luminancia) + `varr` (varianza
    espacial). Atrapa voids negros, cámara enterrada en pared, y cámara apuntando al cielo vacío.
 
-Exit 0 = PASS (seguí al critic). Exit ≠ 0 = **fallo mecánico: arreglalo primero, no gastes
+Exit 0 = PASS (sigue al critic). Exit ≠ 0 = **fallo mecánico: arréglalo primero, no gastes
 tokens de critic.** Esto hubiera atrapado el flip y los frames vacíos en la primera ronda.
 
 ## Gate 1 — Critic visual (independiente del código)
@@ -57,9 +57,9 @@ código ni tu razonamiento ni el spec.
 
 > **Los claims del critic son HIPÓTESIS, no verdad (P1).** Un critic de texto puede afirmar con
 > seguridad "no hay fog / sin bloom / sin AA" cuando el código SÍ los tiene — lee un estilo
-> flat-shaded procedural como "roto". Antes de "arreglar" un claim, **verificalo contra el
+> flat-shaded procedural como "roto". Antes de "arreglar" un claim, **verifícalo contra el
 > código** (grep del feature). Si el feature existe, es percepción/estilo, no bug → no lo
-> persigas. Pasale al critic el **FIDELITY TARGET (dirección) del spec** como ancla, pero el critic
+> persigas. Pásale al critic el **FIDELITY TARGET (dirección) del spec** como ancla, pero el critic
 > NO juzga "cuán realista": juzga **compromiso + especificidad temática**. Reglas, a CUALQUIER
 > fidelidad: (a) NO marcar un estilo elegido (stylized o realista) como defecto por ser ese estilo;
 > (b) NO exigir fotorrealismo; (c) SÍ marcar como defecto el **medio-compromiso/uncanny** (realismo
@@ -72,13 +72,13 @@ código ni tu razonamiento ni el spec.
    - Las **6 poses fijas** a la resolución del TARGET (2560×1440 por defecto), en Chrome con
      WebGPU acelerado por GPU. Guarda `pose0.png … pose5.png`.
    - **Close-ups de cada hero element (clave — detección temprana del plateau).** Además de las 6
-     poses generales, capturá un **primer plano de cada hero element** (reposicionando la cámara vía
+     poses generales, captura un **primer plano de cada hero element** (reposicionando la cámara vía
      `window.__cam`, o usando las poses que el build dedicó a heroes). El plateau de primitivas se
      delata DE CERCA: si sólo ves los heroes a media distancia, el critic no lo marca hasta rondas
      tardías (postmortem sesión 3: la mansión gastó ~4 rondas antes de que el close-up delatara que
-     rosetón/retratos eran primitivas). Guardalos como `hero_<nombre>.png` y pasáselos al critic
+     rosetón/retratos eran primitivas). Guárdalos como `hero_<nombre>.png` y pásaselos al critic
      junto a las poses. **Excepción:** si el spec marcó ese hero como "ver a distancia/silueta"
-     (sujeto sensible, opción (b)), NO le saques close-up — respetá la decisión de dirección de arte.
+     (sujeto sensible, opción (b)), NO le saques close-up — respeta la decisión de dirección de arte.
    - Una **grabación corta del fly-through** (`?flythrough=1`), p.ej. MP4/GIF o una tira de
      frames cada ~0.5 s, para cazar shimmer, aliasing, popping y banding en movimiento.
 2. **Lanzar el critic como subagente aislado** (Agent, `general-purpose`): el prompt contiene
@@ -87,48 +87,48 @@ código ni tu razonamiento ni el spec.
    con severidad (blocker / major / minor) y ubicación (qué pose / qué momento).
    **Rúbrica de calidad POSITIVA (P1 — postmortem sesión 2).** Medir sólo "ausencia de defectos"
    hace que el loop converja a *"no está roto"*, nunca a *"es hermoso"* — y que distintas escenas
-   salgan iguales. Además de defectos, pedile al critic un **score 1–10 en cada eje**: dirección
+   salgan iguales. Además de defectos, pídele al critic un **score 1–10 en cada eje**: dirección
    de arte, composición/legibilidad, **compromiso y factura** (¿está todo ejecutado entero, sin
    efectos a medias? — NO "cuán realista es"), y **especificidad/unicidad** (¿las criaturas y hero
    elements están modelados al sujeto, y la escena se ve distinta de un genérico "primitivas +
    niebla"?). El gate no sólo exige "nada > minor", también que el **score suba ronda a ronda**.
    **El techo escala con los ciclos:** no conviertas el loop en converger a un piso — con ciclos
-   disponibles, empujá MÁS ambición/especificidad. Si el score se estanca dos rondas, NO bajes la
-   vara: es falta de craft específico → volvé a `scene-build` con un cambio estructural (geometría
+   disponibles, empuja MÁS ambición/especificidad. Si el score se estanca dos rondas, NO bajes la
+   vara: es falta de craft específico → vuelve a `scene-build` con un cambio estructural (geometría
    firma), no cosmético.
-   **Check de similitud entre escenas.** Si hay escenas previas, comprobá que ESTA no sea la
+   **Check de similitud entre escenas.** Si hay escenas previas, comprueba que ESTA no sea la
    anterior con otra paleta (mismo toolkit de primitivas). Si se parecen, es un fallo de unicidad
-   (major): exigí a `scene-build` geometría/material/técnica específicos del tema.
+   (major): exige a `scene-build` geometría/material/técnica específicos del tema.
 3. **Iterar** (con disciplina anti-thrash):
    - **Disparador estructural para heroes (anti-plateau).** Si un hero element se marca como
      genérico/primitiva **≥2 rondas**, O la **especificidad no sube en 2 rondas**, PARÁ el tuning
-     cosmético: mandá a `scene-build` una **directiva de malla explícita** — "reemplazá la primitiva
-     X (quad/disco/abanico) por geometría modelada: partes a, b, c" (sacá las partes del GEOMETRY
+     cosmético: manda a `scene-build` una **directiva de malla explícita** — "reemplaza la primitiva
+     X (quad/disco/abanico) por geometría modelada: partes a, b, c" (saca las partes del GEOMETRY
      PLAN del spec). Un hero que rebota NO se arregla con color/luz; es cambio de geometría.
      > **Por qué (postmortem sesión 3).** La mansión embrujada gastó ~4 rondas en tuning (exposición,
      > niebla, saturación del vitral) antes de que quedara claro que rosetón/retratos/criaturas
      > necesitaban malla, no parches. Los scores rebotaban (especificidad 4→3→5→3) en vez de subir:
      > ESA es la firma del plateau. El fix es estructural y temprano, no otra ronda cosmética.
-   - **Ledger persistente de defectos (no critic amnésico).** Mantené una lista acumulada entre
+   - **Ledger persistente de defectos (no critic amnésico).** Mantén una lista acumulada entre
      rondas (defecto → estado: abierto/arreglado/inherente/falso-positivo). El critic nuevo de
-     cada ronda da imparcialidad, pero VOS llevás el ledger: confirmá que los de la ronda previa
+     cada ronda da imparcialidad, pero VOS llevas el ledger: confirma que los de la ronda previa
      se cerraron y que no reaparecen. Sin ledger, el loop hace whack-a-mole (cada ronda inventa
      majors nuevos y el piso de calidad nunca sube).
-   - Clasificá cada finding en: *arreglable* / *inherente-al-estilo* / *falso-positivo del
-     critic* (ver nota de hipótesis). Sólo actuá sobre los *arreglables*.
+   - Clasifica cada finding en: *arreglable* / *inherente-al-estilo* / *falso-positivo del
+     critic* (ver nota de hipótesis). Sólo actúa sobre los *arreglables*.
    - **Causa raíz, no parche repetido**: si el mismo defecto reaparece ≥2 rondas, **parar de
      parchear y aislar la capa** con los flags `?noX` (`?noVeg`, `?noFlock`, …) para encontrar
      la fuente. Un síntoma recurrente es señal de causa raíz, no de "subir la dosis del parche".
-   - Llevá los *arreglables* ≥ major a `scene-build`, re-renderizá y re-evaluá con un critic
+   - Lleva los *arreglables* ≥ major a `scene-build`, re-renderiza y re-evalúa con un critic
      **nuevo** (sin memoria de la ronda anterior).
-   - **Presupuesto de ciclos = techo, no tope de ambición.** Usá el CYCLE CEILING del spec: con
+   - **Presupuesto de ciclos = techo, no tope de ambición.** Usa el CYCLE CEILING del spec: con
      muchos ciclos, "listo" exige MÁS especificidad y compromiso ronda a ronda, no menos. "Listo" =
      la dirección elegida ejecutada ENTERA (sin efectos a medias), criaturas/hero elements modelados
      al sujeto (no primitivas genéricas), y nada > minor — a la fidelidad que el spec pidió. Si se
      estanca primitivo/genérico o a-medias, es cambio estructural pendiente en `scene-build`, no un
      techo de la herramienta. Un render que necesita muchos ciclos para llegar alto es esperable y
-     válido; no bajes la vara para cerrar rápido. Pará sólo al agotar el presupuesto de ciclos del
-     spec, y reportá honestamente qué quedó.
+     válido; no bajes la vara para cerrar rápido. Para sólo al agotar el presupuesto de ciclos del
+     spec, y reporta honestamente qué quedó.
 
 ## Gate 2 — Rendimiento
 Objetivo: frame pacing estable en el TARGET.
@@ -138,19 +138,19 @@ Objetivo: frame pacing estable en el TARGET.
 2. Recoge `window.__perf()` → **avg, p99, max** (preferir GPU timestamp; si no hay, CPU
    `performance.now`). Opcionalmente vuelca `window.__frameLog`.
 3. **CONSCIENCIA DE HARDWARE (obligatorio).** El budget (≤11 ms avg / ≤16.7 ms max) es para la
-   **GPU del TARGET del spec** (p.ej. RTX 5070 Ti). Antes de dar un veredicto, determiná la GPU de
-   la máquina de verificación (`adapter.info`/`requestAdapterInfo`, o reportá "desconocida"):
-   - Si la GPU de verificación **es** la del TARGET → aplicá el criterio tal cual (PASS/FAIL).
-   - Si **no lo es** → NO declares FAIL contra un budget de otra GPU. Reportá los números crudos +
-     la GPU real + la resolución, marcá **"no verificable en este hardware"**, y si querés una
-     señal, compará contra un budget escalado o reportá FPS. Lo que SÍ es válido en cualquier
+   **GPU del TARGET del spec** (p.ej. RTX 5070 Ti). Antes de dar un veredicto, determina la GPU de
+   la máquina de verificación (`adapter.info`/`requestAdapterInfo`, o reporta "desconocida"):
+   - Si la GPU de verificación **es** la del TARGET → aplica el criterio tal cual (PASS/FAIL).
+   - Si **no lo es** → NO declares FAIL contra un budget de otra GPU. Reporta los números crudos +
+     la GPU real + la resolución, marca **"no verificable en este hardware"**, y si quieres una
+     señal, compara contra un budget escalado o reporta FPS. Lo que SÍ es válido en cualquier
      hardware: **estabilidad de pacing** (max/avg, p99, picos periódicos = GC stutter) y el
      **ranking relativo** entre iteraciones. No gastes ciclos "optimizando" para una GPU que no es
      la del spec salvo que el pacing (no el promedio absoluto) esté roto.
 4. **Criterio de aprobado** (en el hardware del TARGET): GPU frame time **≤ 11 ms promedio** y
    **ningún frame > 16.7 ms**. Reporta también p99.
-5. Si no cumple (en hardware del target): identificá la capa culpable (desactivá capas vía query
-   flags o pedí profiling a `scene-build`), optimizá y volvé a medir. Recordá: un efecto que no
+5. Si no cumple (en hardware del target): identifica la capa culpable (desactiva capas vía query
+   flags o pide profiling a `scene-build`), optimiza y vuelve a medir. Recuerda: un efecto que no
    entra en budget se **corta o reemplaza**, no se deja a media resolución feo.
 
 ## Entrega (DONE WHEN)
@@ -161,7 +161,7 @@ Los **tres** gates deben pasar (0 mecánico → 1 critic → 2 perf). Entrega en
 - Lista de defectos corregidos durante la iteración.
 
 ## Extra — Video deliverable (vertical / horizontal, duración parametrizable)
-Para entregar un clip del procedural (showreel, redes, preview), usá
+Para entregar un clip del procedural (showreel, redes, preview), usa
 **`reference/record-video.js`**: graba el fly-through determinista vía `MediaRecorder` sobre
 `canvas.captureStream()` (sin ffmpeg) y escribe un `.webm` (VP9).
 ```
@@ -172,7 +172,7 @@ node reference/record-video.js "file:///ABS/PATH/index.html" vertical  5 video_v
 - Duración: segundos (default 5, parametrizable).
 - Requiere `puppeteer-core` resoluble (mismo setup que `gate0-metrics.js`) y usa el fly-through
   (`?flythrough=1`), así que funciona con cualquier escena que tenga los hooks de `scene-build`.
-- Guardá el clip en la carpeta de la escena (`scenes/<slug>/`).
+- Guarda el clip en la carpeta de la escena (`scenes/<slug>/`).
 
 ## Archivos de apoyo
 - `reference/record-video.js` — graba un clip `.webm` (vertical/horizontal, duración param.) del

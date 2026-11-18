@@ -61,7 +61,7 @@ Donde falte, añade tú detalle coherente y anótalo como "(auto)".
 > `scene-build` colapsaba todo al mismo toolkit (cubos+conos+sprites). Para romper eso, el spec
 > debe **dirigir** la calidad y la unicidad, no sólo listar contenido.
 
-Antes de escribir, definí (proponé vos, el usuario curetea):
+Antes de escribir, define (propón tú, el usuario curetea):
 - **FIDELITY TARGET** — una DIRECCIÓN elegida por tema en el drill-down. **Ni "stylized" ni
   "realistic" son el default; ninguno es "mejor".** El eje NO es realismo↔low-poly.
   > **Por qué (postmortem sesión 3→4).** Ni "realismo por default" ni "low-poly por default"
@@ -69,18 +69,18 @@ Antes de escribir, definí (proponé vos, el usuario curetea):
   > repite el fallo de la sesión 2 (todo se parece: pez=óvalo, pájaro=triángulo, todo=esfera) y
   > pone un **techo bajo fijo** sin importar cuántos ciclos invirtamos. Los dos fallos reales son
   > independientes del estilo: **(1) medio-compromiso** (el uncanny viene del realismo *a medias*,
-  > no del realismo) y **(2) toolkit genérico fijo** (homogeneíza). Diseñá contra ESOS, no contra
+  > no del realismo) y **(2) toolkit genérico fijo** (homogeneíza). Diseña contra ESOS, no contra
   > el realismo.
-  - **Elegí dirección y comprometela entera.** stylized (cel/flat/gradiente, color bold, luz
+  - **Elige dirección y comprométela entera.** stylized (cel/flat/gradiente, color bold, luz
     fuerte, siluetas limpias) *o* realistic (SDF, shadow map+SSAO, PBR). Ambos válidos. Uncanny =
     a medias → cada efecto se ejecuta convincente o se corta, nunca a mitad.
-  - **Modelá al sujeto, nunca una primitiva de reemplazo — a cualquier fidelidad.** Koi =
+  - **Modela al sujeto, nunca una primitiva de reemplazo — a cualquier fidelidad.** Koi =
     cuerpo+aletas+cola; grulla = alas+cuello+patas; pagoda = aleros+ménsulas. Low-poly ≠ genérico:
     un koi low-poly sigue siendo inconfundiblemente un koi. Esto es lo que evita que todo se parezca.
-  - **CYCLE CEILING:** fijá hasta dónde empuja el loop. **El techo escala con los ciclos** — más
+  - **CYCLE CEILING:** fija hasta dónde empuja el loop. **El techo escala con los ciclos** — más
     revisiones = geometría/técnica más específica y MÁS ambición; un plateau significa "más craft
-    específico del sujeto", nunca "bajá la vara". Que un render tarde muchos ciclos está bien.
-  Preguntá la dirección Y el techo de ciclos. Esto fija el FIDELITY TARGET del spec y la vara del
+    específico del sujeto", nunca "baja la vara". Que un render tarde muchos ciclos está bien.
+  Pregunta la dirección Y el techo de ciclos. Esto fija el FIDELITY TARGET del spec y la vara del
   critic en `scene-verify` (que juzga compromiso + especificidad, no cercanía al realismo).
 - **VISUAL SIGNATURE** — la(s) **1–2 técnicas de render únicas** que harán esta escena memorable
   e inconfundible de otras (p.ej. submarino → caústicas proyectadas + refracción; desierto →
@@ -90,22 +90,22 @@ Antes de escribir, definí (proponé vos, el usuario curetea):
   Subnautica", "tipo Moebius", "tipo Blade Runner 2049") para anclar la dirección de arte.
 - **HERO ELEMENTS** — los **3–4 elementos que DEBEN verse espectaculares** (el build pondrá su
   esfuerzo ahí). El resto es relleno atmosférico.
-- **GEOMETRY PLAN por hero element (obligatorio).** Por cada hero, escribí su **descomposición de
+- **GEOMETRY PLAN por hero element (obligatorio).** Por cada hero, escribe su **descomposición de
   malla** — las partes del sujeto que el build debe modelar, no sólo su mood/color. Ej.: "rosetón =
   mullions radiales de piedra + lóbulos/foils + plomos oscuros entre vidrios + figura central";
   "retrato = busto (cabeza+cuello+hombros) + planos faciales + marco con moldura"; "koi = cuerpo +
   pectorales + dorsal + cola bífida". Sin este plan, el build colapsa el hero a un quad/disco/abanico
   y el critic lo lee como primitiva (*plateau de primitivas*, postmortem sesión 3).
 - **Sujetos sensibles a la primitiva (rostros, manos, texto, tracería, animales reconocibles).** El
-  ojo humano los lee como falsos al instante. Por cada hero que caiga aquí, decidí UNA de dos y
-  anotala en el spec:
-  - **(a) Comprometer malla real** — subí su presupuesto de geometría (es donde el build gasta su
+  ojo humano los lee como falsos al instante. Por cada hero que caiga aquí, decide UNA de dos y
+  anótala en el spec:
+  - **(a) Comprometer malla real** — sube su presupuesto de geometría (es donde el build gasta su
     esfuerzo), *o*
   - **(b) Dirigir el arte alrededor de la debilidad** — verlo a **media distancia / en silueta /
     parcialmente ocluido**, nunca en close-up. Elegir esto a nivel spec evita poses que expongan un
     hero que no vas a modelar al detalle. Es gratis y suele rendir más que pelear la malla.
-- **Anti-maximalismo (profundidad > amplitud).** Si el usuario quiere "todo", guialo a priorizar:
-  es mejor un spec de 4 elementos ejecutables de forma excelente que 15 a medias. Marcá
+- **Anti-maximalismo (profundidad > amplitud).** Si el usuario quiere "todo", guíalo a priorizar:
+  es mejor un spec de 4 elementos ejecutables de forma excelente que 15 a medias. Marca
   explícitamente qué es hero y qué es relleno.
 
 ### 3. TARGET (hardware y presupuesto)

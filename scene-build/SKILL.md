@@ -50,30 +50,30 @@ Lee `reference/webgpu-architecture.md` y `reference/performance.md` antes de esc
 > salieron **arquitectónicamente idénticas**: cubos (edificios) + conos (vegetación) + sprites
 > (partículas) + grid de ventanas + niebla de 2 colores + god rays + ACES/bloom. El tema sólo
 > cambió la paleta. Un toolkit fijo produce, inevitablemente, la misma escena con otro color.
-> Evitalo deliberadamente:
+> Evítalo deliberadamente:
 
-- **Respetá el FIDELITY TARGET del spec — es una DIRECCIÓN (stylized o realistic), no un piso.**
+- **Respeta el FIDELITY TARGET del spec — es una DIRECCIÓN (stylized o realistic), no un piso.**
   > **Por qué (postmortem sesión 3→4).** El eje NO es realismo↔low-poly. Dos fallos reales,
   > independientes del estilo: **(1) medio-compromiso** → uncanny (el realismo *a medias* es lo
   > feo, no el realismo); **(2) toolkit genérico** → todo se parece. No evites el uncanny "yendo
-  > más simple": eso solo baja el techo y homogeneíza. Evitá el uncanny **comprometiéndote entero**.
-  - **Comprometé la dirección entera.** Sea stylized o realistic, cada efecto se ejecuta
-    convincente o se corta — **nunca a medias**. Si no podés hacer un efecto COMPLETO dentro del
-    budget, no lo pongas a medias: cortalo o reemplazalo por uno que sí cierre.
-  - **Modelá al sujeto, nunca una primitiva de reemplazo — a CUALQUIER fidelidad.** Un pez tiene
+  > más simple": eso solo baja el techo y homogeneíza. Evita el uncanny **comprometiéndote entero**.
+  - **Compromete la dirección entera.** Sea stylized o realistic, cada efecto se ejecuta
+    convincente o se corta — **nunca a medias**. Si no puedes hacer un efecto COMPLETO dentro del
+    budget, no lo pongas a medias: córtalo o reemplázalo por uno que sí cierre.
+  - **Modela al sujeto, nunca una primitiva de reemplazo — a CUALQUIER fidelidad.** Un pez tiene
     cuerpo+aletas+cola (no un óvalo), un pájaro alas+cuerpo (no un triángulo), un árbol tronco+
     ramas+copa. Low-poly ≠ genérico: un koi low-poly sigue siendo un koi. Esto —no el estilo— es lo
     que hace que dos escenas de temas distintos NO salgan idénticas.
   - **El techo escala con los ciclos del spec (CYCLE CEILING).** Con presupuesto de muchos ciclos,
-    subí la ambición ronda a ronda (geometría más específica, técnica firma más lograda). Un
+    sube la ambición ronda a ronda (geometría más específica, técnica firma más lograda). Un
     plateau = más craft específico, no bajar la vara. No hay problema con que un render tarde.
   - Síntomas de medio-compromiso a EVITAR (no porque sean "realismo", sino porque están *a medias*):
     ruido FBM en albedo fingiendo textura, SSS/fresnel a medias en todo, god-rays difusos tipo
     mancha, niebla lechosa que lava el contraste, specular plástico sobre lambert.
 - **No colapses todo al mismo toolkit.** Antes de reusar "cubo+cono+sprite/óvalo/triángulo",
-  preguntate qué geometría es *específica de ESTE sujeto*. Implementá HERO ELEMENTS, criaturas y
+  pregúntate qué geometría es *específica de ESTE sujeto*. Implementa HERO ELEMENTS, criaturas y
   VISUAL SIGNATURE con geometría propia del tema, no con la primitiva genérica de turno.
-- **Ningún hero element es un quad/disco/abanico plano (regla mecánica).** Seguí el GEOMETRY PLAN
+- **Ningún hero element es un quad/disco/abanico plano (regla mecánica).** Sigue el GEOMETRY PLAN
   del spec: cada hero se construye de **≥3 partes modeladas del sujeto**. Un rosetón NO es un disco
   de cuñas de color — son mullions + lóbulos + plomos + vidrios; un rostro NO es un óvalo + 2 discos
   — son planos faciales (frente, pómulos, nariz, mentón). Si un hero terminó siendo una primitiva
@@ -85,7 +85,7 @@ Lee `reference/webgpu-architecture.md` y `reference/performance.md` antes de esc
   ambos, nunca a medias, y la **LUZ y la COMPOSICIÓN** hacen el trabajo pesado.
 - **Luz con forma.** Más allá de una direccional + ambiente: sombras baratas (shadow map simple
   o contact-shadow), luces locales emisivas que iluminen su entorno, variación de luz por zona.
-- **Técnica firma por tema.** Implementá la(s) 1–2 técnicas de la VISUAL SIGNATURE (p.ej.
+- **Técnica firma por tema.** Implementa la(s) 1–2 técnicas de la VISUAL SIGNATURE (p.ej.
   submarino → caústicas proyectadas + refracción/distorsión; desierto → heat-shimmer + ripples;
   neón-lluvia → reflejos húmedos + wet roughness). Es lo que hace la escena memorable y distinta.
 
@@ -96,7 +96,7 @@ Lee `reference/webgpu-architecture.md` y `reference/performance.md` antes de esc
 - [ ] Controles completos y pointer lock funcionando. **(P0, bug real)** Ningún overlay
       (`#msg`, `#hud`, loaders a pantalla completa con `position:fixed; inset:0`) debe tapar el
       canvas: TODOS llevan `pointer-events:none`, o se comen el click y `requestPointerLock()`
-      nunca dispara → el mouse no gira la vista. Verificá con
+      nunca dispara → el mouse no gira la vista. Verifica con
       `document.elementFromPoint(innerWidth/2, innerHeight/2) === canvas`.
 - [ ] Todos los elementos del SCENE presentes.
 - [ ] Hooks para verificación: poses de cámara fijas, modo fly-through scripteado y timestamp
@@ -106,7 +106,7 @@ Lee `reference/webgpu-architecture.md` y `reference/performance.md` antes de esc
       respetar colisión y clamp de suelo igual que la cámara libre, o la cámara atraviesa el
       pabellón/paredes en la grabación. No dejes el recorrido metido dentro de geometría sólida.
 - [ ] **HUD/overlays ocultos en modos de captura** (bug real): en `?pose`, `?flythrough` y
-      `?calib`, ocultá `#hud`/`#msg` (`display:none`), o el texto de debug queda quemado en los
+      `?calib`, oculta `#hud`/`#msg` (`display:none`), o el texto de debug queda quemado en los
       renders que ve el critic.
 - [ ] **Smoke-test pasado** (ver "Auto-smoke-test" abajo) — NO entregues sin esto.
 
@@ -137,11 +137,11 @@ Deja estos ganchos para que `/scene-verify` funcione sin tocar la lógica de ren
   - Color puro: en el fragment, override al final (`if(kind==marker){ out = col*2.0 }`) **después**
     de todo uso de `fwidth` — un `return` temprano sobre un valor no-uniforme rompe `fwidth`
     (lección aprendida). Exentos de niebla/ambient/floor para que el centroide de color sea limpio.
-  - **Fondo neutro en calib (robustez del Gate 0):** en modo `?calib`, renderizá el resto de la
+  - **Fondo neutro en calib (robustez del Gate 0):** en modo `?calib`, renderiza el resto de la
     escena (cielo + geometría no-marcador) en gris neutro-oscuro. Una escena brillante o muy
     saturada (p.ej. piso dorado) puede colar píxeles en el clasificador de color del marcador y
     contaminar su centroide → falso FAIL de orientación. Sólo los 3 marcadores deben llevar color.
-  - Mantené los marcadores dentro del FOV (offset angular < medio-FOV vertical) o el verde/rojo se
+  - Mantén los marcadores dentro del FOV (offset angular < medio-FOV vertical) o el verde/rojo se
     recortan contra el borde.
   El harness afirma `verde.y < rojo.y` (arriba sobre abajo) y `amarillo.x > centro.x` (+X a la
   derecha) → atrapa flips verticales y espejos horizontales.
@@ -161,15 +161,15 @@ Deja estos ganchos para que `/scene-verify` funcione sin tocar la lógica de ren
 > **Por qué (postmortem sesión 3).** `scene-build` entregó un `index.html` con 4 bugs que dejaban
 > la pantalla en NEGRO (`]);` en vez de `]});`, `type` keyword reservada en WGSL, `struct U` vs
 > binding `U` redeclarado, calib invertida). Los cazó Gate 0 — pero el build debió cazarlos solo.
-> El falso-negativo "lo escribí, debe andar" es caro: una escena que no arranca gasta toda una
+> El falso-negativo "lo escribe, debe andar" es caro: una escena que no arranca gasta toda una
 > ronda de captura/critic en nada.
 
-Antes de declarar la entrega, corré un smoke-test headless automático (Node + puppeteer-core +
+Antes de declarar la entrega, corre un smoke-test headless automático (Node + puppeteer-core +
 el navegador que usa `/scene-verify`). Mínimo:
-1. **Sintaxis JS:** extraé el `<script type="module">` del `index.html` y pasalo por `node --check`.
-   Un error acá = el módulo entero muere (pantalla negra). Arreglalo antes de seguir.
-2. **Carga + WGSL en runtime:** abrí el `index.html` en el navegador headless, escuchá
-   `page.on('console')` y `page.on('pageerror')`, y esperá `window.__ready===true` (timeout ~15 s).
+1. **Sintaxis JS:** extrae el `<script type="module">` del `index.html` y pásalo por `node --check`.
+   Un error aquí = el módulo entero muere (pantalla negra). Arréglalo antes de seguir.
+2. **Carga + WGSL en runtime:** abre el `index.html` en el navegador headless, escucha
+   `page.on('console')` y `page.on('pageerror')`, y espera `window.__ready===true` (timeout ~15 s).
    - CERO `pageerror`. CERO errores de compilación WGSL en consola ("Error while parsing WGSL",
      "reserved keyword", "redeclaration", "no matching overload"). Un warning WGSL que impide crear
      un pipeline = fallo.
@@ -179,7 +179,7 @@ el navegador que usa `/scene-verify`). Mínimo:
 3. Idealmente un screenshot y un check barato de "no-void" (no todo negro) — pero eso ya lo hace
    Gate 0; el mínimo imprescindible es (1)+(2).
 
-Si el smoke-test falla, **arreglá y repetí hasta que pase**; recién ahí entregás. No le pases a
+Si el smoke-test falla, **arregla y repite hasta que pase**; recién ahí entregas. No le pases a
 `/scene-verify` una escena que no arranca.
 
 ## Entrega

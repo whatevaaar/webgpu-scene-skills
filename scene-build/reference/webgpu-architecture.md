@@ -45,7 +45,7 @@ con WGSL embebido en template strings (los shaders se definen UNA vez al inicio,
   cerca, (3) el banco/bandada en movimiento, (4) contraluz con god rays, (5) panorámica a
   distancia (test de niebla/aliasing lejano).
   **≥2 de las 6 DEBEN ser close-ups de hero elements** (no sólo vistas generales): es donde
-  `scene-verify` detecta el *plateau de primitivas*. Encuadrá cada hero de cerca en alguna pose, a
+  `scene-verify` detecta el *plateau de primitivas*. Encuadra cada hero de cerca en alguna pose, a
   menos que el spec lo marque como "ver a distancia/silueta" (sujeto sensible dirigido).
 - **Fly-through** (`?flythrough=1`): spline Catmull-Rom determinista por 60 s que pasa por los
   puntos de interés; sin input; usado para grabar y para el log de frames.
