@@ -85,6 +85,17 @@ Lee `reference/webgpu-architecture.md` y `reference/performance.md` antes de esc
   ambos, nunca a medias, y la **LUZ y la COMPOSICIÓN** hacen el trabajo pesado.
 - **Luz con forma.** Más allá de una direccional + ambiente: sombras baratas (shadow map simple
   o contact-shadow), luces locales emisivas que iluminen su entorno, variación de luz por zona.
+- **El ambient NO debe ser el color de niebla/cielo saturado (bug de material real, sesión 5).**
+  Si el relleno de ambiente (sky-fill) usa directamente el color de atmósfera saturado (p.ej.
+  turquesa), MULTIPLICA el albedo y lo tiñe: arena ocre × ambient turquesa = **verde** → el desierto
+  se ve como pasto y nadie entiende por qué (parece musgo/niebla, no lo es). Usa un **ambient
+  desaturado cálido-neutro** (top levemente frío, bottom cálido de rebote); el color saturado vive
+  en el CIELO y la NIEBLA de distancia, no tiñendo el suelo. Regla: el albedo debe leerse como su
+  color propio bajo el ambient.
+- **Post aditivo (god-rays/bloom) sangra sobre geometría a contraluz.** Un god-ray que acumula la
+  luminancia del cielo hacia el sol se SUMA sobre los píxeles de un objeto oscuro retroiluminado y
+  lo lava a blanco (p.ej. un arco contra el sol). Capa la ganancia, sube el umbral, o enmascara por
+  profundidad; "mirar al sol" no debe borrar la silueta del hero.
 - **Técnica firma por tema.** Implementa la(s) 1–2 técnicas de la VISUAL SIGNATURE (p.ej.
   submarino → caústicas proyectadas + refracción/distorsión; desierto → heat-shimmer + ripples;
   neón-lluvia → reflejos húmedos + wet roughness). Es lo que hace la escena memorable y distinta.
@@ -176,11 +187,20 @@ el navegador que usa `/scene-verify`). Mínimo:
    - `window.__ready===true` dentro del timeout (si nunca se pone en true, algo tira antes del
      primer frame).
    - `canvas.width` > 300 (que el resize haya corrido; 300 = default = nunca inicializó).
-3. Idealmente un screenshot y un check barato de "no-void" (no todo negro) — pero eso ya lo hace
-   Gate 0; el mínimo imprescindible es (1)+(2).
+   - **Prueba los 3 modos de captura, no sólo el default (P0 — postmortem sesión 5).** Carga
+     también `?flythrough=1` y `?calib=1` y afirma CERO `pageerror` + `window.__ready===true` en
+     CADA uno. *Por qué:* un `dt` negativo en el primer frame (timestamp de rAF < `performance.now()`
+     inicial) hacía `flyT<0` → índice de spline `-1` → `undefined` → el fly-through quedaba congelado
+     en "Initializing…", y el smoke-test en modo default **pasaba igual** porque ese branch no se
+     tocaba. Clampa SIEMPRE: `if(dt<0||dt>0.1) dt=0.016;`. Modos distintos = code paths distintos.
+3. **Screenshot + sanidad de geometría (no sólo "no-void").** Saca un screenshot de `?pose=2` (o un
+   close-up de hero) y MÍRALO. *Cargar sin error ≠ geometría correcta:* una malla rota pero
+   sintácticamente válida (p.ej. un barrido con frame degenerado que explota en una cuadrícula de
+   picos) **pasa el (1)+(2) y pasa el void-check de Gate 0** (tiene varianza y no es negra), y sólo
+   se delata al ojo. No entregues sin haber visto al menos un pose con los hero elements.
 
 Si el smoke-test falla, **arregla y repite hasta que pase**; recién ahí entregas. No le pases a
-`/scene-verify` una escena que no arranca.
+`/scene-verify` una escena que no arranca ni una con geometría visiblemente rota.
 
 ## Entrega
 Escribe `index.html` en la **carpeta de la escena** (`scenes/<slug>/`, junto al

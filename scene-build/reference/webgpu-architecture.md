@@ -19,6 +19,14 @@ con WGSL embebido en template strings (los shaders se definen UNA vez al inicio,
     para hojas) **instanciadas** miles de veces con per-instance transform+phase+color.
   - Criaturas: malla base (manta = plano deformado, pez = elipsoide) deformada en el vertex
     shader por tiempo; multitudes vía instancing.
+  - **Barridos / tubos (costillas, gusanos, tallos, ramas): usa TRANSPORTE PARALELO para el frame,
+    NUNCA un `up` de referencia fijo (bug real, sesión 5).** Un tubo barrido a lo largo de una curva
+    que recomputa `cross(tangente, up=(0,1,0))` por anillo EXPLOTA cuando la tangente se vuelve
+    vertical (tangente ∥ up ⇒ cross = 0 ⇒ NaN ⇒ malla en cuadrícula de picos negros). Esto es
+    sintácticamente válido, así que **pasa el smoke-test y el void-check de Gate 0** y sólo se ve al
+    capturar. Fix: siembra una normal perpendicular a la tangente inicial (elige `up=(1,0,0)` si la
+    tangente es casi vertical) y **acarréala anillo a anillo reproyectándola** (`N -= (N·T)T;
+    normalize`), con binormal `B = T×N`. Frame continuo y siempre válido para cualquier curva.
 - **Ruido**: value/Perlin/simplex y FBM implementados en WGSL (sin texturas). Para caústicas,
   sum de ondas o Worley animado. Para "specks"/sparkle, hash por-instancia.
 
@@ -39,7 +47,15 @@ con WGSL embebido en template strings (los shaders se definen UNA vez al inicio,
 ## Cámara y controles
 - Cámara libre: posición + yaw/pitch. Pointer lock en click; `movementX/Y` para mirar.
 - WASD en el plano de vista, Q/E para subir/bajar, Shift multiplica la velocidad.
-- Integra con delta-time; clampa pitch. Matriz view/proj recalculada en scratch arrays.
+- Integra con delta-time; clampa pitch (`if(dt<0||dt>0.1) dt=0.016;` — clampa el dt NEGATIVO del
+  primer frame o rompe el spline del fly-through). Matriz view/proj recalculada en scratch arrays.
+- **FOV y captura vertical (portrait).** El `perspective()` fija el FOV **vertical**; en un canvas
+  portrait (aspect < 1) el FOV **horizontal** se angosta mucho → efecto telefoto que **aplana la
+  profundidad** y hace que todo se sienta "recortado de una toma horizontal". Si vas a producir
+  tomas/videos verticales (p.ej. un modo `?cadaver=N`, `?still=N` con cámara fija sobre un hero),
+  usa un **FOV más ancho** en ese modo (~1.4 rad / 80° vertical) y **compón para profundidad**:
+  mirar *a lo largo* del sujeto (líneas que fugan), capas primer-plano→medio→fondo, ángulos bajos/
+  picados que usan el alto del cuadro. Un gran angular exagera la perspectiva = profundidad.
 - **Poses fijas** (`?pose=0..5`): array de 6 {pos, yaw, pitch} preasignado, elegidas para
   mostrar: (0) vista de apertura del claro, (1) a través de un arco/túnel, (2) un set piece de
   cerca, (3) el banco/bandada en movimiento, (4) contraluz con god rays, (5) panorámica a

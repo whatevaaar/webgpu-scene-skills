@@ -104,6 +104,14 @@ Antes de escribir, define (propón tú, el usuario curetea):
   - **(b) Dirigir el arte alrededor de la debilidad** — verlo a **media distancia / en silueta /
     parcialmente ocluido**, nunca en close-up. Elegir esto a nivel spec evita poses que expongan un
     hero que no vas a modelar al detalle. Es gratis y suele rendir más que pelear la malla.
+  - **(b) NO exime del presupuesto mínimo de partes (lección sesión 5).** Dirigir el encuadre y
+    modelar al sujeto no son excluyentes: aun en silueta, un hero sensible se lee como placeholder si
+    le faltan las **partes que definen su silueta**. Por eso el GEOMETRY PLAN de un hero sensible debe
+    listar un **mínimo de partes no negociable** (ej.: "cráneo = cráneo alargado + mandíbula + 2
+    cuencas"; "esqueleto = N costillas con *taper* de caja torácica + espina conectada + cráneo",
+    NO "costillas = tubos iguales"). Un esqueleto con costillas idénticas y un cráneo-esfera leía como
+    oruga de juguete hasta que el build le puso taper por costilla + mandíbula + cuencas. Si eliges
+    (b), fija igual ese presupuesto mínimo; (b) sólo decide la distancia de cámara, no el detalle cero.
 - **Anti-maximalismo (profundidad > amplitud).** Si el usuario quiere "todo", guíalo a priorizar:
   es mejor un spec de 4 elementos ejecutables de forma excelente que 15 a medias. Marca
   explícitamente qué es hero y qué es relleno.

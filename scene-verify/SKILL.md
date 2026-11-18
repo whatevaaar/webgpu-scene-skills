@@ -51,6 +51,13 @@ Verifica mecánicamente, de forma determinista:
 Exit 0 = PASS (sigue al critic). Exit ≠ 0 = **fallo mecánico: arréglalo primero, no gastes
 tokens de critic.** Esto hubiera atrapado el flip y los frames vacíos en la primera ronda.
 
+> **Gate 0 PASS ≠ geometría correcta (límite conocido, sesión 5).** El void-check sólo mira
+> `darkFrac` + varianza: una malla **explotada pero no-negra** (p.ej. un barrido con frame
+> degenerado que se vuelve una cuadrícula de picos) tiene varianza alta y poco oscuro, así que
+> **pasa Gate 0**. Por eso, al abrir el critic, mirá vos primero los `pose*.png` (sobre todo los
+> close-ups de hero): si ves geometría rota, es bug de `scene-build` (transporte paralelo del
+> barrido), no algo para el critic estético. Gate 0 atrapa flips y voids, no basura geométrica.
+
 ## Gate 1 — Critic visual (independiente del código)
 Objetivo: detección imparcial de defectos. El critic **sólo ve imágenes/vídeo**, jamás el
 código ni tu razonamiento ni el spec.
@@ -85,6 +92,15 @@ código ni tu razonamiento ni el spec.
    SÓLO las imágenes + la rúbrica de `reference/critic-protocol.md`. No incluyas rutas de
    código, ni el spec, ni qué intentabas lograr. Pídele defectos **priorizados y concretos**
    con severidad (blocker / major / minor) y ubicación (qué pose / qué momento).
+   **Ensemble ≥2/3 por defecto para el veredicto (P1 — postmortem sesión 5).** Un critic fresco por
+   ronda da imparcialidad pero el veredicto binario **oscila** entre rondas: en una sesión real, R2
+   dijo "sin blocker" y R3 re-marcó un blocker sobre lo mismo (los soles). No trates una sola corrida
+   como verdad: lanza **2–3 critics en paralelo** (ver `reference/critic-ensemble.md`) y decide por
+   mayoría; una severidad que sólo 1 de 3 reporta es sospechosa. Esto estabiliza el "¿pasó o no?" y
+   evita re-trabajar por el ruido de un critic. Además, **verifica cada claim de causa raíz contra el
+   código antes de actuar** (regla de hipótesis): en esta sesión el critic pidió "agregá ACES" (ya
+   estaba), llamó "specular smear" a un god-ray, y leyó un esqueleto como "gusano/oruga" — 3 falsos
+   positivos de causa raíz que habrían mandado el fix por el camino equivocado.
    **Rúbrica de calidad POSITIVA (P1 — postmortem sesión 2).** Medir sólo "ausencia de defectos"
    hace que el loop converja a *"no está roto"*, nunca a *"es hermoso"* — y que distintas escenas
    salgan iguales. Además de defectos, pídele al critic un **score 1–10 en cada eje**: dirección
@@ -173,6 +189,24 @@ node reference/record-video.js "file:///ABS/PATH/index.html" vertical  5 video_v
 - Requiere `puppeteer-core` resoluble (mismo setup que `gate0-metrics.js`) y usa el fly-through
   (`?flythrough=1`), así que funciona con cualquier escena que tenga los hooks de `scene-build`.
 - Guarda el clip en la carpeta de la escena (`scenes/<slug>/`).
+
+### Video VERTICAL enfocado en un sujeto / cámara estática (postmortem sesión 5)
+Si el pedido es un clip **vertical** centrado en un hero (p.ej. "5 videos del cadáver, sin mover la
+cámara"):
+- **No reuses el fly-through ni el FOV default.** El `?flythrough` mueve la cámara, y el FOV vertical
+  fijo en portrait se siente **telefoto/recortado y plano** (el usuario lo rechaza como "parece
+  horizontal croppeado, sin profundidad"). Pide a `scene-build` un modo de **cámara estática por
+  sujeto** (`?cadaver=N` / `?still=N`: posición + target fijos, la escena sigue animando) con **FOV
+  ancho (~80° vert.)**.
+- **Compón para profundidad:** mirar *a lo largo* del sujeto (líneas que fugan), capas primer-plano→
+  medio→fondo, ángulos bajos/picados que usen el alto del cuadro, variación de luz (contraluz, color
+  de cielo distinto). Mirar "hacia arriba" contra cielo vacío NO da profundidad; anclá al suelo + un
+  elemento lejano. Cuidado: cámaras bajas cerca de un sujeto en una cuenca se **entierran** en el
+  terreno → elevá sobre la línea de dunas.
+- **Flujo obligatorio: por cada toma, screenshot vertical → critic de encuadre → recién ahí grabá los
+  N segundos.** Un critic de cinematografía juzga profundidad + composición vertical + sujeto legible
+  y da GOOD/ADJUST con reframe concreto; itera los stills baratos ANTES de comprometer grabaciones de
+  20 s.
 
 ## Archivos de apoyo
 - `reference/record-video.js` — graba un clip `.webm` (vertical/horizontal, duración param.) del
