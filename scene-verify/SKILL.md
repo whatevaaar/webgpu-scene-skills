@@ -101,7 +101,7 @@ código ni tu razonamiento ni el spec.
    (major): exige a `scene-build` geometría/material/técnica específicos del tema.
 3. **Iterar** (con disciplina anti-thrash):
    - **Disparador estructural para heroes (anti-plateau).** Si un hero element se marca como
-     genérico/primitiva **≥2 rondas**, O la **especificidad no sube en 2 rondas**, PARÁ el tuning
+     genérico/primitiva **≥2 rondas**, O la **especificidad no sube en 2 rondas**, PARA el tuning
      cosmético: manda a `scene-build` una **directiva de malla explícita** — "reemplaza la primitiva
      X (quad/disco/abanico) por geometría modelada: partes a, b, c" (saca las partes del GEOMETRY
      PLAN del spec). Un hero que rebota NO se arregla con color/luz; es cambio de geometría.
@@ -111,7 +111,7 @@ código ni tu razonamiento ni el spec.
      > ESA es la firma del plateau. El fix es estructural y temprano, no otra ronda cosmética.
    - **Ledger persistente de defectos (no critic amnésico).** Mantén una lista acumulada entre
      rondas (defecto → estado: abierto/arreglado/inherente/falso-positivo). El critic nuevo de
-     cada ronda da imparcialidad, pero VOS llevas el ledger: confirma que los de la ronda previa
+     cada ronda da imparcialidad, pero TÚ llevas el ledger: confirma que los de la ronda previa
      se cerraron y que no reaparecen. Sin ledger, el loop hace whack-a-mole (cada ronda inventa
      majors nuevos y el piso de calidad nunca sube).
    - Clasifica cada finding en: *arreglable* / *inherente-al-estilo* / *falso-positivo del
