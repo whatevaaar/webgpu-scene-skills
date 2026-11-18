@@ -71,6 +71,14 @@ código ni tu razonamiento ni el spec.
 1. **Capturar** (ver `reference/critic-protocol.md` para comandos concretos):
    - Las **6 poses fijas** a la resolución del TARGET (2560×1440 por defecto), en Chrome con
      WebGPU acelerado por GPU. Guarda `pose0.png … pose5.png`.
+   - **Close-ups de cada hero element (clave — detección temprana del plateau).** Además de las 6
+     poses generales, capturá un **primer plano de cada hero element** (reposicionando la cámara vía
+     `window.__cam`, o usando las poses que el build dedicó a heroes). El plateau de primitivas se
+     delata DE CERCA: si sólo ves los heroes a media distancia, el critic no lo marca hasta rondas
+     tardías (postmortem sesión 3: la mansión gastó ~4 rondas antes de que el close-up delatara que
+     rosetón/retratos eran primitivas). Guardalos como `hero_<nombre>.png` y pasáselos al critic
+     junto a las poses. **Excepción:** si el spec marcó ese hero como "ver a distancia/silueta"
+     (sujeto sensible, opción (b)), NO le saques close-up — respetá la decisión de dirección de arte.
    - Una **grabación corta del fly-through** (`?flythrough=1`), p.ej. MP4/GIF o una tira de
      frames cada ~0.5 s, para cazar shimmer, aliasing, popping y banding en movimiento.
 2. **Lanzar el critic como subagente aislado** (Agent, `general-purpose`): el prompt contiene
@@ -92,6 +100,15 @@ código ni tu razonamiento ni el spec.
    anterior con otra paleta (mismo toolkit de primitivas). Si se parecen, es un fallo de unicidad
    (major): exigí a `scene-build` geometría/material/técnica específicos del tema.
 3. **Iterar** (con disciplina anti-thrash):
+   - **Disparador estructural para heroes (anti-plateau).** Si un hero element se marca como
+     genérico/primitiva **≥2 rondas**, O la **especificidad no sube en 2 rondas**, PARÁ el tuning
+     cosmético: mandá a `scene-build` una **directiva de malla explícita** — "reemplazá la primitiva
+     X (quad/disco/abanico) por geometría modelada: partes a, b, c" (sacá las partes del GEOMETRY
+     PLAN del spec). Un hero que rebota NO se arregla con color/luz; es cambio de geometría.
+     > **Por qué (postmortem sesión 3).** La mansión embrujada gastó ~4 rondas en tuning (exposición,
+     > niebla, saturación del vitral) antes de que quedara claro que rosetón/retratos/criaturas
+     > necesitaban malla, no parches. Los scores rebotaban (especificidad 4→3→5→3) en vez de subir:
+     > ESA es la firma del plateau. El fix es estructural y temprano, no otra ronda cosmética.
    - **Ledger persistente de defectos (no critic amnésico).** Mantené una lista acumulada entre
      rondas (defecto → estado: abierto/arreglado/inherente/falso-positivo). El critic nuevo de
      cada ronda da imparcialidad, pero VOS llevás el ledger: confirmá que los de la ronda previa

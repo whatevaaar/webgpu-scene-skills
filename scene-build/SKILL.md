@@ -73,6 +73,11 @@ Lee `reference/webgpu-architecture.md` y `reference/performance.md` antes de esc
 - **No colapses todo al mismo toolkit.** Antes de reusar "cubo+cono+sprite/óvalo/triángulo",
   preguntate qué geometría es *específica de ESTE sujeto*. Implementá HERO ELEMENTS, criaturas y
   VISUAL SIGNATURE con geometría propia del tema, no con la primitiva genérica de turno.
+- **Ningún hero element es un quad/disco/abanico plano (regla mecánica).** Seguí el GEOMETRY PLAN
+  del spec: cada hero se construye de **≥3 partes modeladas del sujeto**. Un rosetón NO es un disco
+  de cuñas de color — son mullions + lóbulos + plomos + vidrios; un rostro NO es un óvalo + 2 discos
+  — son planos faciales (frente, pómulos, nariz, mentón). Si un hero terminó siendo una primitiva
+  plana, no está hecho: es exactamente lo que el critic marca y lo que estanca el loop (plateau).
 - **Profundidad > amplitud (hero elements).** Mejor 3–4 elementos específicos y comprometidos que
   15 primitivas genéricas. Si el spec es maximalista, prioridad a los hero elements.
 - **Materiales: comprometidos y coherentes con la dirección.** stylized → color cohesivo + banda

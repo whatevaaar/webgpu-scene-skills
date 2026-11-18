@@ -56,7 +56,13 @@ ART REFERENCE: {{one concrete aesthetic reference to anchor art direction — e.
 "Moebius", "Blade Runner 2049"}}
 
 HERO ELEMENTS: {{the 3-4 elements that MUST look spectacular — the build spends its effort here;
-everything else is atmospheric filler. Depth over breadth.}}
+everything else is atmospheric filler. Depth over breadth. For EACH hero, give a GEOMETRY PLAN: the
+subject parts the build must model (e.g. "rose window = radial stone mullions + lobed foils + dark
+lead cames between glass + central figure"; "portrait = bust: head+neck+shoulders + facial planes +
+molded frame") — NOT a single flat quad/disc/fan, which the critic reads as a generic primitive.
+For PRIMITIVE-SENSITIVE subjects (faces, hands, text, tracery, recognizable animals) either (a)
+commit a real mesh, or (b) art-direct around it: seen at mid-distance / in silhouette / partially
+occluded, never in close-up.}}
 
 CONSTRAINTS
 - No Three.js/Babylon.js or other engines.

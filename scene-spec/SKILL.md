@@ -90,6 +90,20 @@ Antes de escribir, definí (proponé vos, el usuario curetea):
   Subnautica", "tipo Moebius", "tipo Blade Runner 2049") para anclar la dirección de arte.
 - **HERO ELEMENTS** — los **3–4 elementos que DEBEN verse espectaculares** (el build pondrá su
   esfuerzo ahí). El resto es relleno atmosférico.
+- **GEOMETRY PLAN por hero element (obligatorio).** Por cada hero, escribí su **descomposición de
+  malla** — las partes del sujeto que el build debe modelar, no sólo su mood/color. Ej.: "rosetón =
+  mullions radiales de piedra + lóbulos/foils + plomos oscuros entre vidrios + figura central";
+  "retrato = busto (cabeza+cuello+hombros) + planos faciales + marco con moldura"; "koi = cuerpo +
+  pectorales + dorsal + cola bífida". Sin este plan, el build colapsa el hero a un quad/disco/abanico
+  y el critic lo lee como primitiva (*plateau de primitivas*, postmortem sesión 3).
+- **Sujetos sensibles a la primitiva (rostros, manos, texto, tracería, animales reconocibles).** El
+  ojo humano los lee como falsos al instante. Por cada hero que caiga aquí, decidí UNA de dos y
+  anotala en el spec:
+  - **(a) Comprometer malla real** — subí su presupuesto de geometría (es donde el build gasta su
+    esfuerzo), *o*
+  - **(b) Dirigir el arte alrededor de la debilidad** — verlo a **media distancia / en silueta /
+    parcialmente ocluido**, nunca en close-up. Elegir esto a nivel spec evita poses que expongan un
+    hero que no vas a modelar al detalle. Es gratis y suele rendir más que pelear la malla.
 - **Anti-maximalismo (profundidad > amplitud).** Si el usuario quiere "todo", guialo a priorizar:
   es mejor un spec de 4 elementos ejecutables de forma excelente que 15 a medias. Marcá
   explícitamente qué es hero y qué es relleno.
